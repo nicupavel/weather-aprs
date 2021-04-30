@@ -1,0 +1,20 @@
+{
+    "name": "weather-aprs",
+    "version": "1.0.0",
+    "description": "Weather APRS Service",
+    "main": "index.js",
+    "scripts": {
+        "run": "node index.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Nicu Pavel <npavel@linuxconsulting.ro>",
+    "license": "ISC",
+    "dependencies": {
+        "dotenv": "^8.2.0",
+        "express": "^4.17.1",
+        "js-aprs-fap": "^1.1.1",
+        "js-aprs-is": "^1.0.5",
+        "jsonwebtoken": "^8.5.1",
+        "mongodb": "^3.6.6"
+    }
+}
