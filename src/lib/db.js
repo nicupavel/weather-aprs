@@ -36,7 +36,7 @@ module.exports = (function() {
 
     async function getStationByName(stationName) {
         console.log(`Looking up ${stationName}`)
-        let result = await stationData.findOne({ stationName: stationName });
+        let result = await stationData.findOne({ stationName: stationName }, { sort: { day: -1 } });
         if (result) {
             let weather = result.samples[result.samples.length - 1];
             return {
@@ -133,6 +133,7 @@ module.exports = (function() {
     async function setStationData(object) {
         try {
             if (!object.sourceCallsign || !object.longitude || !object.latitude || !object.wx) {
+                console.log(`Missing data for ${object.sourceCallsign} ${object.longitude}:${object.latitude} ${object.wx}`);
                 return;
             }
 
