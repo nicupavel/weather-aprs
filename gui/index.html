@@ -1,156 +1,94 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 
 <head>
-    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
-    <meta content="utf-8" http-equiv="encoding">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.2.1/css/ol.css" type="text/css">
-    <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.2.1/build/ol.js"></script>
-    <script src="https://kit.fontawesome.com/9e54fd4c31.js" crossorigin="anonymous"></script>
-    <title>Weather Stations</title>
+    <title>Weather APRS</title>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.0/dist/MarkerCluster.Default.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.0/dist/MarkerCluster.css" />
+
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.0/dist/leaflet.markercluster.js" crossorigin=""></script>
 </head>
 
 <body>
-    <h2>Weather Stations</h2>
-    <div id="map" style="height: 1000px; width: 100%;"></div>
-    <div id="popup" style="background-color: white; border: 1px solid black; width:300px; min-height:80px">POPUP with information</div>
-    <script type="text/javascript">
-        var req = new XMLHttpRequest();
+    <div id="mapid" style="width: 100%; height: 800px"></div>
+    <script>
+        let map = L.map("mapid").setView([47, 27], 3);
+
+        // add the OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+        }).addTo(map);
+
+        let markers = L.markerClusterGroup({
+            maxClusterRadius: 100
+        });
+
+        //--------------------------------------------------------------------------------------------------------------
+        // API Calls
+
+        let req = new XMLHttpRequest();
         console.log("Getting all stations");
-        req.addEventListener("progress", updateProgress);
         req.open("GET", "http://127.0.0.1:9090/api/v0/stations");
         req.send();
-
-        function updateProgress(e) {}
 
         req.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 const data = JSON.parse(this.responseText);
+                console.log(data);
                 const features = [];
                 for (const s in data) {
-                    let c = data[s].location.coordinates;
-                    features.push(new ol.Feature({
-                        name: s,
-                        geometry: new ol.geom.Point(ol.proj.fromLonLat([c[0], c[1]])),
-                        weather: data[s].weather
-                    }));
-                }
-
-
-                // create the source and layer for random features
-                const vectorSource = new ol.source.Vector({
-                    features
-                });
-
-                var clusterSource = new ol.source.Cluster({
-                    distance: 50,
-                    source: vectorSource
-                });
-
-                const iconStyle = new ol.style.Style({
-                    text: new ol.style.Text({
-                        text: '\uf3c5',
-                        font: '900 20px "Font Awesome 5 Free"',
-                    })
-                });
-                const labelStyle = new ol.style.Style({
-                    text: new ol.style.Text({
-                        font: '12px Calibri,sans-serif',
-                        overflow: true,
-                        fill: new ol.style.Fill({
-                            color: '#000'
-                        }),
-                        stroke: new ol.style.Stroke({
-                            color: '#fff',
-                            width: 3
-                        }),
-                        offsetY: -16
-                    })
-                });
-
-                var styleCache = {};
-                var vectorLayer = new ol.layer.Vector({
-                    source: clusterSource,
-                    style: function(feature, resolution) {
-                        var innerFeat = feature.get('features')
-                        var size = innerFeat.length;
-                        var style = styleCache[size];
-                        if (!style) {
-                            style = [iconStyle, labelStyle];
-                            styleCache[size] = style;
-                        }
-
-                        if (size === 1) {
-                            labelStyle.getText().setText(innerFeat[0].get('name'));
-                        } else {
-                            labelStyle.getText().setText(size.toString());
-                        }
-
-                        return style;
-                    }
-                });
-                // create map and add layers
-                const map = new ol.Map({
-                    target: 'map',
-                    layers: [
-                        new ol.layer.Tile({
-                            source: new ol.source.OSM()
-                        }),
-                        vectorLayer
-                    ],
-                    view: new ol.View({
-                        center: ol.proj.fromLonLat([27, 47]),
-                        zoom: 3
-                    })
-                });
-
-                var popup = new ol.Overlay({
-                    element: document.getElementById('popup'),
-                });
-                map.addOverlay(popup);
-
-                map.on('singleclick', function(evt) {
-                    var element = popup.getElement();
-                    element.style.display = "none";
-                    map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
-                        if (feature) {
-
-                            var coord = feature.getGeometry().getCoordinates();
-                            var props = feature.getProperties();
-                            var name = props.features[0].values_.name;
-                            var req_station = new XMLHttpRequest();
-                            req.open("GET", `http://127.0.0.1:9090/api/v0/station/${name}`);
-                            req.send();
-
-                            req.onreadystatechange = function() {
-                                if (this.readyState == 4 && this.status == 200) {
-                                    try {
-                                        const data = JSON.parse(this.responseText);
-                                        console.log(data);
-                                        let wdate = new Date(data.weather.timestamp).toString();
-                                        let wx = data.weather.wx;
-                                        let hdms = ol.coordinate.toStringHDMS(ol.proj.toLonLat(coord));
-                                        popup.setPosition(coord);
-                                        element.innerHTML = "<b>Station " + name +
-                                            "</b><br> " + wdate +
-                                            " <br> Wind Gust: " + (wx.wind_gust || "None") +
-                                            " <br> Wind Direction: " + (wx.wind_direction || "None") +
-                                            " <br> Wind Speed: " + (wx.wind_speed || "None") +
-                                            " <br> Temperature: " + wx.temp +
-                                            " <br> Rain 24h " + (wx.rain_24h || "None") +
-                                            " <br> Humidity " + wx.humidity +
-                                            " <br> Pressure: " + wx.pressure;
-                                        element.style.display = "block";
-
-                                    } catch (e) {
-                                        console.log(e);
-                                    }
-
-                                }
-                            }
-                        }
+                    const c = data[s].location.coordinates;
+                    const marker = L.marker(new L.LatLng(c[1], c[0]), {
+                        title: s
                     });
-                });
+                    markers.addLayer(marker);
+
+                }
+                map.addLayer(markers);
+                markers.on('click', function(a) {
+                    let stationName = a.layer.options.title;
+                    let req = new XMLHttpRequest();
+                    req.open("GET", `http://127.0.0.1:9090/api/v0/station/${stationName}`);
+                    req.send();
+
+                    req.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                            try {
+                                const data = JSON.parse(this.responseText);
+                                console.log(data);
+                                const wdate = new Date(data.weather.timestamp).toString();
+                                const wx = data.weather.wx;
+                                let html = "<b>Station " + name +
+                                    "</b><br> " + wdate +
+                                    " <br> Wind Gust: " + (wx.wind_gust || "None") +
+                                    " <br> Wind Direction: " + (wx.wind_direction || "None") +
+                                    " <br> Wind Speed: " + (wx.wind_speed || "None") +
+                                    " <br> Temperature: " + wx.temp +
+                                    " <br> Rain 24h " + (wx.rain_24h || "None") +
+                                    " <br> Humidity " + wx.humidity +
+                                    " <br> Pressure: " + wx.pressure;
+
+                                let popup = L.popup()
+                                    .setLatLng(a.layer.getLatLng())
+                                    .setContent(html)
+                                    .openOn(map);
+
+                            } catch (e) {
+                                console.log(e);
+                            }
+
+                        }
+                    }
+
+
+                })
             }
         }
     </script>
