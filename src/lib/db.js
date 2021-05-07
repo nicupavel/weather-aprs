@@ -51,7 +51,6 @@ module.exports = (function() {
     }
 
     async function getAllStations() {
-        const today = new Date(new Date().setUTCHours(0, 0, 0, 0));
         console.log(`Getting all stations`);
         let result = await stations.find({});
         if (result) {
@@ -66,6 +65,27 @@ module.exports = (function() {
 
         return {};
     }
+
+    async function getAllStationsAndTodayData() {
+        const today = new Date(new Date().setUTCHours(0, 0, 0, 0));
+        console.log(`Getting all stations and today data`);
+        let result = await stationData.find({ day: today });
+
+        if (result) {
+            let res = {};
+            for await (const station of result) {
+                let weather = station.samples[station.samples.length - 1];
+                res[station.stationName] = {
+                    location: station.location,
+                    weather: weather,
+                }
+            }
+            return res;
+        }
+
+        return {};
+    }
+
 
     async function getNearbyStationsUnsorted(lat, lon, dist) {
         console.log(`Looking up nearby ${lat} latitude ${lon} longitude ${dist} distance`);
@@ -208,6 +228,7 @@ module.exports = (function() {
         getNearbyStations: getNearbyStations,
         getNearbyStationsUnsorted: getNearbyStationsUnsorted,
         getAllStations: getAllStations,
+        getAllStationsAndTodayData: getAllStationsAndTodayData,
     }
 
 })();

@@ -16,11 +16,38 @@
     <style>
         .weather-marker {
             color: black;
-            border: 3px solid lightgrey;
-            background-color: lightblue;
+            border: 3px solid darkslategray;
             border-radius: 50%;
             width: 30px;
             height: 30px;
+            font-weight: bold;
+            font-size: 14px;
+            text-align: center;
+            line-height: 30px;
+        }
+        
+        .darkviolet {
+            background-color: darkviolet;
+        }
+        
+        .slateblue {
+            background-color: slateblue;
+        }
+        
+        .greenyellow {
+            background-color: greenyellow;
+        }
+        
+        .orange {
+            background-color: orange;
+        }
+        
+        .orangered {
+            background-color: orangered;
+        }
+        
+        .firebrick {
+            background-color: firebrick;
         }
     </style>
 </head>
@@ -32,20 +59,31 @@
 
         // add the OpenStreetMap tiles
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            maxZoom: 19,
+            maxZoom: 15,
             attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>',
         }).addTo(map);
 
         let markers = L.markerClusterGroup({
-            maxClusterRadius: 70,
+            maxClusterRadius: 50,
         });
+
+        //--------------------------------------------------------------------------------------------------------------
+        // Utility
+        function tempToColor(temp) {
+            if (temp < 0) return "darkviolet";
+            else if (temp < 10) return "slateblue";
+            else if (temp < 20) return "greenyellow";
+            else if (temp < 30) return "orange";
+            else if (temp < 40) return "orangered";
+            else return "firebrick";
+        }
 
         //--------------------------------------------------------------------------------------------------------------
         // API Calls
 
         let req = new XMLHttpRequest();
         console.log("Getting all stations");
-        req.open("GET", "http://127.0.0.1:9090/api/v0/stations");
+        req.open("GET", "http://127.0.0.1:9090/api/v0/stations/data");
         req.send();
 
         req.onreadystatechange = function() {
@@ -55,18 +93,24 @@
                 const features = [];
                 for (const s in data) {
                     const c = data[s].location.coordinates;
+                    const w = data[s].weather.wx;
+                    const temp = Math.round(w.temp);
+
                     const icon = L.divIcon({
                         iconSize: null,
-                        className: "weather-marker",
-                        html: s
+                        className: "weather-marker " + tempToColor(temp),
+                        html: temp,
                     });
+
                     const markerData = {
-                        title: s
+                        title: s,
+                        weather: w,
                     };
                     const marker = L.marker(new L.LatLng(c[1], c[0]), {
                         icon: icon,
-                        data: markerData
+                        data: markerData,
                     });
+
                     markers.addLayer(marker);
                 }
                 map.addLayer(markers);

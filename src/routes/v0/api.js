@@ -2,6 +2,7 @@ const Router = require('express').Router();
 const DB = require('../../lib/db.js');
 
 Router.get("/stations", getAllStations);
+Router.get("/stations/data", getAllStationsAndTodayData);
 Router.get("/station/:name", getStationByName);
 Router.get("/nearby/:lat/:lon/:dist", getNearbyStations);
 
@@ -19,6 +20,10 @@ async function getNearbyStations(req, res) {
 
 async function getAllStations(req, res) {
     return httpJSONResponse(res, await DB.getAllStations());
+}
+
+async function getAllStationsAndTodayData(req, res) {
+    return httpJSONResponse(res, await DB.getAllStationsAndTodayData());
 }
 
 //----------------------------------------------------------------------------------------------------
