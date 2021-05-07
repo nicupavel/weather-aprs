@@ -13,6 +13,16 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.0/dist/MarkerCluster.css" />
 
     <script src="https://unpkg.com/leaflet.markercluster@1.5.0/dist/leaflet.markercluster.js" crossorigin=""></script>
+    <style>
+        .weather-marker {
+            color: black;
+            border: 3px solid lightgrey;
+            background-color: lightblue;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+        }
+    </style>
 </head>
 
 <body>
@@ -21,13 +31,13 @@
         let map = L.map("mapid").setView([47, 27], 3);
 
         // add the OpenStreetMap tiles
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
             maxZoom: 19,
-            attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+            attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>',
         }).addTo(map);
 
         let markers = L.markerClusterGroup({
-            maxClusterRadius: 100
+            maxClusterRadius: 70,
         });
 
         //--------------------------------------------------------------------------------------------------------------
@@ -45,15 +55,23 @@
                 const features = [];
                 for (const s in data) {
                     const c = data[s].location.coordinates;
-                    const marker = L.marker(new L.LatLng(c[1], c[0]), {
+                    const icon = L.divIcon({
+                        iconSize: null,
+                        className: "weather-marker",
+                        html: s
+                    });
+                    const markerData = {
                         title: s
+                    };
+                    const marker = L.marker(new L.LatLng(c[1], c[0]), {
+                        icon: icon,
+                        data: markerData
                     });
                     markers.addLayer(marker);
-
                 }
                 map.addLayer(markers);
-                markers.on('click', function(a) {
-                    let stationName = a.layer.options.title;
+                markers.on("click", function(a) {
+                    let stationName = a.layer.options.data.title;
                     let req = new XMLHttpRequest();
                     req.open("GET", `http://127.0.0.1:9090/api/v0/station/${stationName}`);
                     req.send();
@@ -65,32 +83,35 @@
                                 console.log(data);
                                 const wdate = new Date(data.weather.timestamp).toString();
                                 const wx = data.weather.wx;
-                                let html = "<b>Station " + name +
-                                    "</b><br> " + wdate +
-                                    " <br> Wind Gust: " + (wx.wind_gust || "None") +
-                                    " <br> Wind Direction: " + (wx.wind_direction || "None") +
-                                    " <br> Wind Speed: " + (wx.wind_speed || "None") +
-                                    " <br> Temperature: " + wx.temp +
-                                    " <br> Rain 24h " + (wx.rain_24h || "None") +
-                                    " <br> Humidity " + wx.humidity +
-                                    " <br> Pressure: " + wx.pressure;
+                                let html =
+                                    "<b>Station " +
+                                    stationName +
+                                    "</b><br> " +
+                                    wdate +
+                                    " <br> Wind Gust: " +
+                                    (wx.wind_gust || "None") +
+                                    " <br> Wind Direction: " +
+                                    (wx.wind_direction || "None") +
+                                    " <br> Wind Speed: " +
+                                    (wx.wind_speed || "None") +
+                                    " <br> Temperature: " +
+                                    wx.temp +
+                                    " <br> Rain 24h " +
+                                    (wx.rain_24h || "None") +
+                                    " <br> Humidity " +
+                                    wx.humidity +
+                                    " <br> Pressure: " +
+                                    wx.pressure;
 
-                                let popup = L.popup()
-                                    .setLatLng(a.layer.getLatLng())
-                                    .setContent(html)
-                                    .openOn(map);
-
+                                let popup = L.popup().setLatLng(a.layer.getLatLng()).setContent(html).openOn(map);
                             } catch (e) {
                                 console.log(e);
                             }
-
                         }
-                    }
-
-
-                })
+                    };
+                });
             }
-        }
+        };
     </script>
 </body>
 
