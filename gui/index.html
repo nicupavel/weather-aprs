@@ -65,6 +65,7 @@
 
         let markers = L.markerClusterGroup({
             maxClusterRadius: 50,
+            disableClusteringAtZoom: 8
         });
 
         //--------------------------------------------------------------------------------------------------------------
@@ -80,10 +81,11 @@
 
         //--------------------------------------------------------------------------------------------------------------
         // API Calls
-
+        const server = "127.0.0.1"
+        const port = 9090
         let req = new XMLHttpRequest();
         console.log("Getting all stations");
-        req.open("GET", "http://127.0.0.1:9090/api/v0/stations/data");
+        req.open("GET", `http://${server}:${port}/api/v0/stations/data`);
         req.send();
 
         req.onreadystatechange = function() {
@@ -117,7 +119,7 @@
                 markers.on("click", function(a) {
                     let stationName = a.layer.options.data.title;
                     let req = new XMLHttpRequest();
-                    req.open("GET", `http://127.0.0.1:9090/api/v0/station/${stationName}`);
+                    req.open("GET", `http://${server}:${port}/api/v0/station/${stationName}`);
                     req.send();
 
                     req.onreadystatechange = function() {
