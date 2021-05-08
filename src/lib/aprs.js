@@ -3,90 +3,93 @@ const aprsParser = require("js-aprs-fap").aprsParser;
 const DB = require('./db');
 const Config = require("../config");
 
-module.exports = (function() {
-    "use strict";
+"use strict";
 
-    const timeout = 60 * 1000;
-    let connectionTimer;
-    let lastPacketTimestamp = Date.now();
-    let connectionHandle;
-    let parser = new aprsParser();
+class APRS {
+    constructor(host, port, pass, filter, timeout) {
+        this.host = host;
+        this.port = port;
+        this.pass = pass;
+        this.filter = filter;
 
-    //----------------------------------------------------------------------------------------------------
-    //
-    //
+        this.connectionTimer = null;
+        this.timeout = timeout || 60 * 1000;
+        this.lastPacketTimestamp = Date.now();
+        this.connectionHandle = null;
 
-    function connect() {
-        if (connectionHandle && connectionHandle.isConnected()) {
-            console.log("APRS: Connection still up, disconnecting");
-            connectionHandle.disconnect()
+        let parser = new aprsParser();
+    }
+
+    connect() {
+        if (this.connectionHandle && this.connectionHandle.isConnected()) {
+            console.log(`APRS (${this.host}): Connection still up, disconnecting`);
+            this.connectionHandle.disconnect()
         }
-        console.log("APRS: Connecting to APRS")
+        console.log(`APRS: Connecting to APRS ${this.host}:${this.port}`);
         setTimeout(() => {
-            init();
-            connectionHandle.connect();
+            this.init();
+            this.connectionHandle.connect();
         }, 3000);
     }
 
+    disconnect() {
+        this.connectionHandle.disconnect();
+        clearInterval(this.connectionTimer);
+    }
+
     //----------------------------------------------------------------------------------------------------
     //
     //
 
-    function CALLSIGN() {
-        return "NOCALL-" + Math.floor(Math.random() * (99 - 10) + 10);
+    init() {
+        const callsign = this.CALLSIGN()
+        this.connectionHandle = new ISSocket(this.host, this.port, callsign, this.pass, this.filter, "RainMachine APRS v1");
+        console.log(`APRS: Initialised: ${this.host}:${this.port} as ${callsign}`);
+
+        this.connectionHandle.on("connect", () => {
+            console.log(`APRS (${this.host}): Connected`);
+            this.connectionHandle.sendLine(this.connectionHandle.userLogin);
+        });
+
+        this.connectionHandle.on("packet", () => { return this.onPacket });
+
+        this.connectionHandle.on("error", (err) => {
+            console.log(`APRS (${this.host}): Error: ${err}`);
+        });
+
+        this.connectionHandle.on("close", (err) => {
+            console.log(`APRS (${this.host}): Connection closed: ${err}`);
+        });
+
+        clearInterval(this.connectionTimer);
+        this.connectionTimer = setInterval(() => {
+            if (Date.now() - this.lastPacketTimestamp > this.timeout) {
+                console.error(`APRS (${this.host}): No packet received in ${this.timeout / 1000} seconds reconnecting`);
+                this.connect();
+            }
+        }, this.timeout * 2);
     }
 
-
-    function onPacket(data) {
+    onPacket(data) {
         if (data.charAt(0) != "#" && !data.startsWith("user")) {
             const packet = parser.parseaprs(data);
             DB.updateStations(packet);
             DB.setStationData(packet);
-            lastPacketTimestamp = Date.now();
+            this.lastPacketTimestamp = Date.now();
         } else {
             console.log(data);
             if (data === "# Login by user not allowed") {
-                connectionHandle.disconnect();
+                this.connectionHandle.disconnect();
             }
         }
-    }
-
-    function init() {
-        const callsign = CALLSIGN()
-        connectionHandle = new ISSocket(Config.APRS_SERVER, Config.APRS_PORT, callsign, Config.APRS_PASS, Config.APRS_FILTER, "RainMachine APRS v1");
-        console.log(`APRS: Initialised: ${Config.APRS_SERVER}:${Config.APRS_PORT} as ${callsign}`);
-
-        connectionHandle.on("connect", () => {
-            console.log("APRS: Connected");
-            connectionHandle.sendLine(connectionHandle.userLogin);
-        });
-
-        connectionHandle.on("packet", onPacket);
-
-        connectionHandle.on("error", (err) => {
-            console.log("APRS: Error: " + err);
-        });
-
-        connectionHandle.on("close", (err) => {
-            console.log("APRS: Connection closed: " + err);
-        });
-
-        clearInterval(connectionTimer);
-        connectionTimer = setInterval(() => {
-            if (Date.now() - lastPacketTimestamp > timeout) {
-                console.error(`APRS: No packet received in ${timeout / 1000} seconds reconnecting`);
-                connect();
-            }
-        }, timeout * 2);
-
     }
 
     //----------------------------------------------------------------------------------------------------
     //
     //
-
-    return {
-        connect: connect
+    CALLSIGN() {
+        return "NOCALL-" + Math.floor(Math.random() * (99 - 10) + 10);
     }
+}
 
-})();
+exports.APRS = APRS;
