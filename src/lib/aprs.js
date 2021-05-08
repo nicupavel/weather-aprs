@@ -17,7 +17,7 @@ class APRS {
         this.lastPacketTimestamp = Date.now();
         this.connectionHandle = null;
 
-        let parser = new aprsParser();
+        this.parser = new aprsParser();
     }
 
     connect() {
@@ -51,7 +51,7 @@ class APRS {
             this.connectionHandle.sendLine(this.connectionHandle.userLogin);
         });
 
-        this.connectionHandle.on("packet", () => { return this.onPacket });
+        this.connectionHandle.on("packet", (data) => { return this.onPacket(data) });
 
         this.connectionHandle.on("error", (err) => {
             console.log(`APRS (${this.host}): Error: ${err}`);
@@ -72,7 +72,7 @@ class APRS {
 
     onPacket(data) {
         if (data.charAt(0) != "#" && !data.startsWith("user")) {
-            const packet = parser.parseaprs(data);
+            const packet = this.parser.parseaprs(data);
             DB.updateStations(packet);
             DB.setStationData(packet);
             this.lastPacketTimestamp = Date.now();
