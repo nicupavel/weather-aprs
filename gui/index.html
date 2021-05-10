@@ -15,6 +15,18 @@
     <script src="https://unpkg.com/leaflet.markercluster@1.5.0/dist/leaflet.markercluster.js" crossorigin=""></script>
     <script src=" https://unpkg.com/@joergdietrich/leaflet.terminator@1.0.0/L.Terminator.js"></script>
     <style>
+        .fullpage-overlay {
+            opacity: 0.3;
+            background: #000;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            top: 0;
+            left: 0;
+            position: fixed;
+            text-align: center;
+        }
+        
         .weather-marker {
             color: black;
             border: 3px solid darkslategray;
@@ -72,11 +84,61 @@
         .firebrick {
             background-color: firebrick;
         }
+        
+        .lds-ring {
+            display: inline-block;
+            position: relative;
+            width: 80px;
+            height: 80px;
+            top: 25%;
+        }
+        
+        .lds-ring div {
+            box-sizing: border-box;
+            display: block;
+            position: absolute;
+            width: 64px;
+            height: 64px;
+            margin: 8px;
+            border: 8px solid #fff;
+            border-radius: 50%;
+            animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+            border-color: #fff transparent transparent transparent;
+        }
+        
+        .lds-ring div:nth-child(1) {
+            animation-delay: -0.45s;
+        }
+        
+        .lds-ring div:nth-child(2) {
+            animation-delay: -0.3s;
+        }
+        
+        .lds-ring div:nth-child(3) {
+            animation-delay: -0.15s;
+        }
+        
+        @keyframes lds-ring {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 
 <body>
-    <div id="mapid" style="width: 100%; height: 800px"></div>
+    <div id="loading" class="fullpage-overlay">
+        <div class="lds-ring">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+    <div id="mapid" style="width: 100%; height: 800px; z-index: 0"></div>
     <script>
         let map = L.map("mapid").setView([47, 27], 3);
 
@@ -89,7 +151,7 @@
         let DN = L.terminator();
         DN.addTo(map);
         setInterval(() => {
-            DN.setTime()
+            DN.setTime();
         }, 1000);
 
         let markers = L.markerClusterGroup({
@@ -109,9 +171,9 @@
                 return L.divIcon({
                     html: `<div badge="+">${avgValue}</div>`,
                     className: "weather-marker " + tempToColor(avgValue),
-                    iconSize: null
+                    iconSize: null,
                 });
-            }
+            },
         });
 
         //--------------------------------------------------------------------------------------------------------------
@@ -127,14 +189,15 @@
 
         //--------------------------------------------------------------------------------------------------------------
         // API Calls
-        const server = "127.0.0.1"
-        const port = 9090
+        const server = "127.0.0.1";
+        const port = 9090;
         let req = new XMLHttpRequest();
         console.log("Getting temp for all stations");
         req.open("GET", `http://${server}:${port}/api/v0/stations/data/tight/temp`);
         req.send();
 
         req.onreadystatechange = function() {
+            document.getElementById("loading").style.display = "none";
             if (this.readyState == 4 && this.status == 200) {
                 const data = JSON.parse(this.responseText);
                 let stationsCount = 0;
@@ -160,7 +223,7 @@
 
                     markers.addLayer(marker);
                 }
-                console.log(stationsCount)
+                console.log(stationsCount);
                 map.addLayer(markers);
                 markers.on("click", function(a) {
                     let stationName = a.layer.options.data.title;
