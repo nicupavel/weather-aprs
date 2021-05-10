@@ -66,6 +66,7 @@ module.exports = (function() {
         return {};
     }
 
+    // Sends all station along with a loose data format
     async function getAllStationsAndTodayData() {
         const today = new Date(new Date().setUTCHours(0, 0, 0, 0));
         console.log(`Getting all stations and today data`);
@@ -82,8 +83,51 @@ module.exports = (function() {
             }
             return res;
         }
-
         return {};
+    }
+
+
+    // Sends all station along with a tight data format
+    async function getAllStationsAndTodayTightData(weatherKeys) {
+        const today = new Date(new Date().setUTCHours(0, 0, 0, 0));
+
+        let keys;
+        if (weatherKeys) {
+            keys = weatherKeys.split(',')
+        }
+
+        console.log(`Getting all stations and today tight data with ${keys}`);
+
+        let result = await stationData.find({ day: today });
+        if (result) {
+            let res = {};
+            for await (const station of result) {
+                let weather = station.samples[station.samples.length - 1];
+
+                res[station.stationName] = [
+                    ...station.location.coordinates.map(o => { return o ? parseFloat(o.toFixed(4)) : o }),
+                    weather.timestamp / 1000 >> 0
+                ]
+
+                __conditionalAddWeatherProp("wind_gust", res[station.stationName], keys, weather.wx);
+                __conditionalAddWeatherProp("wind_direction", res[station.stationName], keys, weather.wx);
+                __conditionalAddWeatherProp("wind_speed", res[station.stationName], keys, weather.wx);
+                __conditionalAddWeatherProp("temp", res[station.stationName], keys, weather.wx);
+                __conditionalAddWeatherProp("rain_1h", res[station.stationName], keys, weather.wx);
+                __conditionalAddWeatherProp("rain_24h", res[station.stationName], keys, weather.wx);
+                __conditionalAddWeatherProp("rain_midnight", res[station.stationName], keys, weather.wx);
+                __conditionalAddWeatherProp("humidity", res[station.stationName], keys, weather.wx);
+                __conditionalAddWeatherProp("pressure", res[station.stationName], keys, weather.wx);
+            }
+            return res;
+        }
+        return {};
+    }
+
+    function __conditionalAddWeatherProp(name, dest, keysList, keysValues) {
+        if (!keysList || (keysList.indexOf(name) !== -1)) {
+            dest.push(keysValues[name]);
+        }
     }
 
 
@@ -153,7 +197,7 @@ module.exports = (function() {
     async function setStationData(object) {
         try {
             if (!object.sourceCallsign || !object.longitude || !object.latitude || !object.wx) {
-                console.log(`Missing data for ${object.sourceCallsign} ${object.longitude}:${object.latitude} ${object.wx}`);
+                //console.log(`Missing data for ${object.sourceCallsign} ${object.longitude}:${object.latitude} ${object.wx}`);
                 return;
             }
 
@@ -177,7 +221,7 @@ module.exports = (function() {
                     day: today
                 }
             };
-            console.log(stationName);
+            console.log(`${object.aprsSource}:${stationName}`);
             const result = await stationData.updateOne(filter, data, options);
         } catch (e) {
             console.error(e);
@@ -229,6 +273,7 @@ module.exports = (function() {
         getNearbyStationsUnsorted: getNearbyStationsUnsorted,
         getAllStations: getAllStations,
         getAllStationsAndTodayData: getAllStationsAndTodayData,
+        getAllStationsAndTodayTightData: getAllStationsAndTodayTightData
     }
 
 })();

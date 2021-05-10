@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.0/dist/MarkerCluster.css" />
 
     <script src="https://unpkg.com/leaflet.markercluster@1.5.0/dist/leaflet.markercluster.js" crossorigin=""></script>
+    <script src=" https://unpkg.com/@joergdietrich/leaflet.terminator@1.0.0/L.Terminator.js"></script>
     <style>
         .weather-marker {
             color: black;
@@ -24,6 +25,28 @@
             font-size: 14px;
             text-align: center;
             line-height: 30px;
+        }
+        
+        [badge]:after {
+            background-color: lightseagreen;
+            border-radius: 50%;
+            height: 10px;
+            color: #fff;
+            content: attr(badge);
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: -8px;
+            min-width: 10px;
+            padding: 2px;
+            line-height: 10px;
+            position: absolute;
+            text-align: center;
+        }
+        
+        [badge^="-"]:after,
+        [badge="0"]:after,
+        [badge=""]:after {
+            display: none;
         }
         
         .darkviolet {
@@ -60,12 +83,35 @@
         // add the OpenStreetMap tiles
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
             maxZoom: 15,
-            attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>',
+            attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
         }).addTo(map);
+
+        let DN = L.terminator();
+        DN.addTo(map);
+        setInterval(() => {
+            DN.setTime()
+        }, 1000);
 
         let markers = L.markerClusterGroup({
             maxClusterRadius: 50,
-            disableClusteringAtZoom: 8
+            disableClusteringAtZoom: 12,
+            iconCreateFunction: function(cluster) {
+                const markers = cluster.getAllChildMarkers();
+                let count = 0;
+                let sum = 0;
+                for (const s of markers) {
+                    count++;
+                    sum += +s.options.data.visibleValue;
+                }
+
+                let avgValue = Math.round(sum / count);
+
+                return L.divIcon({
+                    html: `<div badge="+">${avgValue}</div>`,
+                    className: "weather-marker " + tempToColor(avgValue),
+                    iconSize: null
+                });
+            }
         });
 
         //--------------------------------------------------------------------------------------------------------------
@@ -84,19 +130,18 @@
         const server = "127.0.0.1"
         const port = 9090
         let req = new XMLHttpRequest();
-        console.log("Getting all stations");
-        req.open("GET", `http://${server}:${port}/api/v0/stations/data`);
+        console.log("Getting temp for all stations");
+        req.open("GET", `http://${server}:${port}/api/v0/stations/data/tight/temp`);
         req.send();
 
         req.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 const data = JSON.parse(this.responseText);
-                console.log(data);
+                let stationsCount = 0;
                 const features = [];
                 for (const s in data) {
-                    const c = data[s].location.coordinates;
-                    const w = data[s].weather.wx;
-                    const temp = Math.round(w.temp);
+                    stationsCount++;
+                    const temp = Math.round(data[s][3]);
 
                     const icon = L.divIcon({
                         iconSize: null,
@@ -106,15 +151,16 @@
 
                     const markerData = {
                         title: s,
-                        weather: w,
+                        visibleValue: temp,
                     };
-                    const marker = L.marker(new L.LatLng(c[1], c[0]), {
+                    const marker = L.marker(new L.LatLng(data[s][1], data[s][0]), {
                         icon: icon,
                         data: markerData,
                     });
 
                     markers.addLayer(marker);
                 }
+                console.log(stationsCount)
                 map.addLayer(markers);
                 markers.on("click", function(a) {
                     let stationName = a.layer.options.data.title;

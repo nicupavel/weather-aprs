@@ -3,6 +3,7 @@ const DB = require('../../lib/db.js');
 
 Router.get("/stations", getAllStations);
 Router.get("/stations/data", getAllStationsAndTodayData);
+Router.get("/stations/data/tight/:keys?", getAllStationsAndTodayTightData);
 Router.get("/station/:name", getStationByName);
 Router.get("/nearby/:lat/:lon/:dist", getNearbyStations);
 
@@ -24,6 +25,10 @@ async function getAllStations(req, res) {
 
 async function getAllStationsAndTodayData(req, res) {
     return httpJSONResponse(res, await DB.getAllStationsAndTodayData());
+}
+
+async function getAllStationsAndTodayTightData(req, res) {
+    return httpJSONResponse(res, await DB.getAllStationsAndTodayTightData(req.params.keys));
 }
 
 //----------------------------------------------------------------------------------------------------

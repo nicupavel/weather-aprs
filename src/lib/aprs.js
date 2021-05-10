@@ -73,6 +73,7 @@ class APRS {
     onPacket(data) {
         if (data.charAt(0) != "#" && !data.startsWith("user")) {
             const packet = this.parser.parseaprs(data);
+            packet.aprsSource = this.host;
             DB.updateStations(packet);
             DB.setStationData(packet);
             this.lastPacketTimestamp = Date.now();
