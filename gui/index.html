@@ -117,6 +117,58 @@
         .lds-ring div:nth-child(3) {
             animation-delay: -0.15s;
         }
+        .leaflet-popup-content-wrapper {
+            width: 400px !important;
+        }
+        .leaflet-container a.leaflet-popup-close-button {
+            padding: 14px 14px 0 0 !important;
+            font: 24px/15px Tahoma, Verdana, sans-serif !important;
+            font-weight: 300 !important;
+        }
+        .stationName {
+            font-size: 1.735rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin: 0 !important;
+        }
+        .date {
+            font-weight: 400;
+            font-size: 0.75rem;
+            color: rgb(132, 142, 154);
+            margin: 0 !important;
+        }
+        .tempwind {
+            display: table;
+            width: 366px;
+            margin-top: 1em;
+        }
+        .temp, .wind, .rain, .humidity, .pressure {
+            display: table-cell;
+            vertical-align: top;
+            width: 33%;
+        }
+        .tempvalue, .weathervalue {
+            font-size: 4em;
+            font-weight: 700;
+            margin: 0 !important;
+        }
+        .weathervalue {
+            font-size: 2.2em;
+            font-weight: 300;
+        }
+        .temp {
+            width: 60%;
+        }
+        .wind {
+            width: 40%;
+        }
+        .subtitle {
+            font-size: 0.735rem;
+            font-weight: 300;
+            text-transform: uppercase;
+            color: #555;
+        }
+
         
         @keyframes lds-ring {
             0% {
@@ -239,24 +291,34 @@
                                 const wdate = new Date(data.weather.timestamp).toString();
                                 const wx = data.weather.wx;
                                 let html =
-                                    "<b>Station " +
+                                    "<p class='stationName'>" +
                                     stationName +
-                                    "</b><br> " +
+                                    "</p> " +
+                                    "<p class='date'>" +
                                     wdate +
-                                    " <br> Wind Gust: " +
+                                    "</p>" +
+                                    "<div class='tempwind'><div class='temp'><span class='subtitle'>Temperature<br></span><p class='tempvalue'>" +
+                                    wx.temp + 
+                                    "</p></div>" +
+                                    "<div class='wind'><span class='subtitle'>Wind<br></span>"  +
+                                    " <br>Gust: " +
                                     (wx.wind_gust || "None") +
-                                    " <br> Wind Direction: " +
+                                    " <br>Direction: " +
                                     (wx.wind_direction || "None") +
-                                    " <br> Wind Speed: " +
+                                    " <br>Speed: " +
                                     (wx.wind_speed || "None") +
-                                    " <br> Temperature: " +
-                                    wx.temp +
-                                    " <br> Rain 24h " +
+                                    "</div>" +
+                                    "</div>" +
+                                    "<hr style='width: 366px;'>" +
+                                    "<div class='tempwind'><div class='rain'><span class='subtitle'>Rain Last 24h<br></span><p class='weathervalue'>" +
                                     (wx.rain_24h || "None") +
-                                    " <br> Humidity " +
+                                    "</p></div>" +
+                                    "<div class='humidity'><span class='subtitle'>Humidity<br></span><p class='weathervalue'>"  +
                                     wx.humidity +
-                                    " <br> Pressure: " +
-                                    wx.pressure;
+                                    "</p></div>" +
+                                    "<div class='pressure'><span class='subtitle'>Pressure<br></span><p class='weathervalue'>"  +
+                                    wx.pressure; +
+                                    "</p></div>"
 
                                 let popup = L.popup().setLatLng(a.layer.getLatLng()).setContent(html).openOn(map);
                             } catch (e) {
