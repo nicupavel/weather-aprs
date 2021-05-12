@@ -374,7 +374,8 @@
                                 const data = JSON.parse(this.responseText);
                                 console.log(data);
                                 const wdate = new Date(data.weather.timestamp).toString();
-                                const ago = data.weather.timestamp - Date.now() / 1000 >> 0;
+                                const ago = (Date.now() - data.weather.timestamp) / 1000 >> 0;
+                                console.log(ago);
                                 const wx = data.weather.wx;
 
                                 let html =
@@ -382,7 +383,7 @@
                                     ${stationName}
                                     </p>
                                     <p class='date'>
-                                    ${secondsToText(ago)}
+                                    ${secondsToText(ago)} ago
                                     </p>
                                     <div class='tempwind'><div class='temp'><span class='suptitle'>Temperature<br></span><p class='tempvalue'>
                                     ${(wx.temp || '--')} <sup>°C</sup>
