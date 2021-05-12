@@ -194,10 +194,12 @@
             margin-top: 0px;
             margin-right: 5px;
         }
+        
         .iconrain {
             stroke-width: 10;
             stroke: #3399ff;
         }
+        
         sup {
             font-size: 0.55em;
             margin-left: -0.3em;
@@ -328,6 +330,35 @@
             return text;
         };
 
+        function defined(x) {
+            return (x !== null && typeof x !== 'undefined')
+        }
+
+        function validateWeather(wx) {
+            const inval = '--';
+            if (!defined(wx.temp) || wx.temp < -50 || wx.temp > 50) {
+                wx.temp = inval;
+            }
+            if (!defined(wx.wind_gust) || wx.wind_gust < 0 || wx.wind_gust > 50) {
+                wx.wind_gust = inval;
+            }
+            if (!defined(wx.wind) || wx.wind < 0 || wx.wind > 200) {
+                wx.wind = inval;
+            }
+            if (!defined(wx.wind_direction) || wx.wind_direction < 0 || wx.wind_direction > 360) {
+                wx.wind_direction = inval;
+            }
+            if (!defined(wx.humidity) || wx.humidity < 0 || wx.humidity > 100) {
+                wx.wind_gust = inval;
+            }
+            if (!defined(wx.pressure) || wx.pressure < 500 || wx.pressure > 1200) {
+                wx.pressure = inval;
+            }
+            if (!defined(wx.rain_24h) || wx.rain_24h < 0 || wx.rain_24h > 170) {
+                wx.rain_24h = inval;
+            }
+        }
+
         //--------------------------------------------------------------------------------------------------------------
         // API Calls
         const server = "127.0.0.1";
@@ -381,6 +412,7 @@
                                 const ago = (Date.now() - data.weather.timestamp) / 1000 >> 0;
                                 console.log(ago);
                                 const wx = data.weather.wx;
+                                validateWeather(wx);
 
                                 let html =
                                     `<p class='stationName'>
