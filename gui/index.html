@@ -194,10 +194,14 @@
             margin-top: 0px;
             margin-right: 5px;
         }
-        
         .iconrain {
             stroke-width: 10;
             stroke: #3399ff;
+        }
+        sup {
+            font-size: 0.55em;
+            margin-left: -0.3em;
+            color: #555;
         }
         
         @keyframes lds-ring {
@@ -385,16 +389,16 @@
                                     <p class='date'>
                                     ${secondsToText(ago)} ago
                                     </p>
-                                    <div class='tempwind'><div class='temp'><span class='suptitle'>Temperature<br></span><p class='tempvalue'>
+                                    <div class='tempwind'><div class='temp'><span class='subtitle'>Temperature<br></span><p class='tempvalue'>
                                     ${(wx.temp || '--')} <sup>°C</sup>
                                     </p></div>
                                     <div class='wind'><span class='subtitle'>Wind<br></span>
                                     <br>Gust: 
-                                    ${(wx.wind_gust || "--")} <sup>m/s</sup>
+                                    <strong>${(wx.wind_gust || "--")}</strong> <sup>m/s</sup>
                                     <br>Direction: 
-                                    ${(degreesToCardinal(wx.wind_direction) || "--")}
+                                    <strong>${(degreesToCardinal(wx.wind_direction) || "--")}</strong>
                                     <br>Speed:
-                                    ${(wx.wind_speed || "--")} <sup>km/h</sup>
+                                    <strong>${(wx.wind_speed || "--")}</strong> <sup>km/h</sup>
                                     </div>
                                     </div>
                                     <hr style='width: 366px;'>
