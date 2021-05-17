@@ -24,6 +24,7 @@ module.exports = (function() {
             let result = await stations.createIndex({ "location": "2dsphere" });
             result = await stations.createIndex({ stationName: "text" });
             result = await stationData.createIndex({ stationName: "text" });
+            result = await stationData.createIndex({ day: 1 }, { expireAfterSeconds: 31622400 }); // Expire after 1 year
 
         } finally {
             console.log(`Connected to ${Config.MONGO_DB_NAME} DB`);
@@ -97,13 +98,12 @@ module.exports = (function() {
         }
 
         console.log(`Getting all stations and today tight data with ${keys}`);
-
-        let result = await stationData.find({ day: today });
+        const projection = { samples: { $slice: -1 } };
+        const result = await stationData.find({ day: today }).project(projection);
         if (result) {
             let res = {};
             for await (const station of result) {
-                let weather = station.samples[station.samples.length - 1];
-
+                const weather = station.samples[0];
                 res[station.stationName] = [
                     ...station.location.coordinates.map(o => { return o ? parseFloat(o.toFixed(4)) : o }),
                     weather.timestamp / 1000 >> 0
