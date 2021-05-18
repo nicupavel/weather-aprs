@@ -203,13 +203,27 @@
             margin-left: -0.3em;
             color: #555;
         }
-        
+
         @keyframes lds-ring {
             0% {
                 transform: rotate(0deg);
             }
             100% {
                 transform: rotate(360deg);
+            }
+        }
+        @media only screen and (max-width: 600px)  {
+            .leaflet-popup-content-wrapper {
+                transform: scale(0.8);
+            }
+            .leaflet-container a.leaflet-popup-close-button {
+                padding: 32px 48px 0 0 !important;
+            }
+            .leaflet-popup, .leaflet-zoom-animated {
+                bottom:-46px !important;
+            }
+            .leaflet-popup-tip-container {
+                margin-top:-24px;
             }
         }
     </style>
@@ -330,7 +344,7 @@
 
         //--------------------------------------------------------------------------------------------------------------
         // API Calls
-        const server = "127.0.0.1";
+        const server = "hall.linuxconsulting.ro";
         const port = 9090;
         let req = new XMLHttpRequest();
         console.log("Getting temp for all stations");
