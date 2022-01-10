@@ -10,7 +10,7 @@ Connects to APRS servers and downloads data from stations around the world. All 
 querying all stations or station by name or nearby latitude/longitude location. 
 
 ## Live URL
-[ws.labs.rainmachine.com](https://ws.labs.rainmachine.com)
+[ws.labs.rainmachine.com](http://ws.labs.rainmachine.com)
 
 ## UI
 There is a sample UI that shows stations and allow clicking on them for detalied information.
