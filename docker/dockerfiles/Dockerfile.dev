@@ -1,0 +1,6 @@
+FROM node:12
+WORKDIR /weather-aprs
+COPY ../../ ./
+RUN npm install nodemon -g && \
+    npm install
+CMD ["nodemon", "/weather-aprs/index.js"]

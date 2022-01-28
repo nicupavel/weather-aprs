@@ -9,8 +9,8 @@ function init() {
     apiServer.use(Express.json());
     apiServer.use("/api/v0/", apiV0);
 
-    apiServer.listen(Config.HTTP_PORT, () => {
-        console.log(`API HTTP Server started on ${Config.HTTP_PORT}`)
+    apiServer.listen(Config.API_HTTP_PORT, () => {
+        console.log(`API HTTP Server started on ${Config.API_HTTP_PORT}`)
     });
 
     apiServer.on('close', () => {

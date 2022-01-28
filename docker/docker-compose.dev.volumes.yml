@@ -1,0 +1,8 @@
+# Override for mounting local sources to container
+# Caveat: node, node-modules should have the same version as in container
+version: '3.7'
+services:
+  proxy:
+    volumes:
+      - ../gui:/usr/share/nginx/html/  
+  
