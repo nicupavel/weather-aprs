@@ -1,11 +1,26 @@
 version: '3.7'
 services:
   proxy:
-    image: nginx:latest
+    build:
+      context: ../
+      dockerfile: ./docker/dockerfiles/Dockerfile.nginx
     hostname: proxy
     ports:
       - "${PROXY_HTTP_PORT}:80"
       - "${PROXY_HTTPS_PORT}:443"
+    environment:
+      - API_HTTP_PORT=${API_HTTP_PORT}
+    networks:
+      - dev
+
+  weather:
+    image: weather
+    hostname: weather
+    build:
+      context: ../
+      dockerfile: ./docker/dockerfiles/Dockerfile.weather${DOCKERFILE_EXT}
+    ports:
+      - "${API_HTTP_PORT}"
     networks:
       - dev
 
@@ -21,24 +36,24 @@ services:
     networks:
       - dev
 
-  influxdb:
-    image: influxdb:latest
-    hostname: monitoring
-    volumes:
-      - ./data/influxdb:/var/lib/influxdb2
-      - ./provisioning/influxdb:/docker-entrypoint-initdb.d
-    environment:
-      DOCKER_INFLUXDB_INIT_MODE: setup
-      DOCKER_INFLUXDB_INIT_USERNAME: ${INFLUXDB_INIT_USERNAME}
-      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUXDB_INIT_PASSWORD}
-      DOCKER_INFLUXDB_INIT_ORG: ${INFLUXDB_INIT_ORG}
-      DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUXDB_INIT_BUCKET}
-      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_INIT_ADMIN_TOKEN}
-      DOCKER_INFLUXDB_INIT_RETENTION: 180d
-    ports:
-      - "${INFLUXDB_PORT}:8086"
-    networks:
-      - dev
+  #influxdb:
+  #  image: influxdb:latest
+  #  hostname: monitoring
+  #  volumes:
+  #    - ./data/influxdb:/var/lib/influxdb2
+  #    - ./provisioning/influxdb:/docker-entrypoint-initdb.d
+  #  environment:
+  #    DOCKER_INFLUXDB_INIT_MODE: setup
+  #    DOCKER_INFLUXDB_INIT_USERNAME: ${INFLUXDB_INIT_USERNAME}
+  #    DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUXDB_INIT_PASSWORD}
+  #    DOCKER_INFLUXDB_INIT_ORG: ${INFLUXDB_INIT_ORG}
+  #    DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUXDB_INIT_BUCKET}
+  #    DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_INIT_ADMIN_TOKEN}
+  #    DOCKER_INFLUXDB_INIT_RETENTION: 180d
+  #  ports:
+  #    - "${INFLUXDB_PORT}:8086"
+  #  networks:
+  #    - dev
 
 networks:
  dev:

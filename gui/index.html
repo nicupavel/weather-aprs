@@ -379,7 +379,8 @@
         const port = 9090;
         let req = new XMLHttpRequest();
         console.log("Getting temp for all stations");
-        req.open("GET", `http://${server}:${port}/api/v0/stations/data/tight/temp`);
+        //req.open("GET", `http://${server}:${port}/api/v0/stations/data/tight/temp`);
+        req.open("GET", `/api/v0/stations/data/tight/temp`);
         req.send();
 
         req.onreadystatechange = function() {
@@ -414,7 +415,8 @@
                 markers.on("click", function(a) {
                     let stationName = a.layer.options.data.title;
                     let req = new XMLHttpRequest();
-                    req.open("GET", `http://${server}:${port}/api/v0/station/${stationName}`);
+                    //req.open("GET", `http://${server}:${port}/api/v0/station/${stationName}`);
+                    req.open("GET", `/api/v0/station/${stationName}`);
                     req.send();
 
                     req.onreadystatechange = function() {

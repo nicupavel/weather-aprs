@@ -18,7 +18,8 @@
         var req = new XMLHttpRequest();
         console.log("Getting all stations");
         req.addEventListener("progress", updateProgress);
-        req.open("GET", "http://127.0.0.1:9090/api/v0/stations");
+        //req.open("GET", "http://127.0.0.1:9090/api/v0/stations");
+        req.open("GET", "/api/v0/stations");
         req.send();
 
         function updateProgress(e) {}
@@ -119,7 +120,8 @@
                             var props = feature.getProperties();
                             var name = props.features[0].values_.name;
                             var req_station = new XMLHttpRequest();
-                            req.open("GET", `http://127.0.0.1:9090/api/v0/station/${name}`);
+                            //req.open("GET", `http://127.0.0.1:9090/api/v0/station/${name}`);
+                            req.open("GET", `/api/v0/station/${name}`);
                             req.send();
 
                             req.onreadystatechange = function() {

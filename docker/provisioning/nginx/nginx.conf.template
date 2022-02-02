@@ -1,0 +1,20 @@
+server {
+        listen 80;
+        listen [::]:80;        
+        client_max_body_size 512m;
+
+        location /api {
+                proxy_pass http://weather:${API_HTTP_PORT}/api;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection 'upgrade';
+                proxy_set_header Host $host;
+                proxy_cache_bypass $http_upgrade;
+                proxy_buffering off;
+        }
+        
+        location / {
+                root /usr/share/nginx/html;                 
+                try_files $uri $uri/ /index.html;
+        }
+}

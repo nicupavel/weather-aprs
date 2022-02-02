@@ -1,6 +1,7 @@
 FROM node:12
 WORKDIR /weather-aprs
-COPY ../../ ./
+COPY src ./src/
+COPY .env index.js package.json package-lock.json ./
 RUN npm install nodemon -g && \
     npm install
 CMD ["nodemon", "/weather-aprs/index.js"]

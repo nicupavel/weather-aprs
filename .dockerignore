@@ -1,5 +1,5 @@
-*
-!src
-!index.js
-!package.json
-!package-lock.json
+#*
+#!src
+#!index.js
+#!package.json
+#!package-lock.json

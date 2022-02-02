@@ -29,10 +29,13 @@ fi
 
 docker_opts=""
 if [ ${DEVELOP_LOCALLY} -eq 1 ]; then
+    set -a
+    export DOCKERFILE_EXT=.dev
+    set +a
     echo "Adding local folders as volumes for development"
     docker_opts="-f docker-compose.yml -f docker-compose.dev.volumes.yml"
 fi
 
 sudo -E docker-compose build "$@"
-#sudo docker-compose $docker_opts up
+sudo -E docker-compose $docker_opts up
 

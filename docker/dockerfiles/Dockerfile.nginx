@@ -1,0 +1,6 @@
+FROM nginx
+COPY ./gui/ /usr/share/nginx/html/
+COPY ./docker/provisioning/nginx/nginx.conf.template /etc/nginx/conf.d/
+COPY ./docker/provisioning/nginx/docker-entrypoint.sh /
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["nginx", "-g", "daemon off;"]
