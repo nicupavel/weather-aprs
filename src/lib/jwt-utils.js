@@ -1,3 +1,5 @@
+const Config = require("../config");
+
 module.exports = (function () {
 
 	"use strict";
@@ -7,7 +9,7 @@ module.exports = (function () {
 	//
 	const Crypto = require("crypto");
 	const JWT = require("jsonwebtoken");
-	const m_jwtSecret = "bd1ce43b-d2ad-47e4-b3ad-261b7d51f5d5";
+	const m_jwtSecret = Config.JWT_SECRET;
 
 	//--------------------------------------------------------------------------------------
 	//

@@ -7,8 +7,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.0/dist/MarkerCluster.Default.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.0/dist/MarkerCluster.css" />
 
@@ -26,19 +30,21 @@
             position: fixed;
             text-align: center;
         }
-        
+
         .weather-marker {
             color: black;
-            border: 3px solid darkslategray;
+            border: 2px solid white;
             border-radius: 50%;
             width: 30px;
             height: 30px;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 15px;
             text-align: center;
             line-height: 30px;
+            box-shadow: 0 0 1px 4px rgba(70, 70, 70, 0.8);
+            bottom: 10px;
         }
-        
+
         [badge]:after {
             background-color: lightseagreen;
             border-radius: 50%;
@@ -54,37 +60,40 @@
             position: absolute;
             text-align: center;
         }
-        
+
         [badge^="-"]:after,
         [badge="0"]:after,
         [badge=""]:after {
             display: none;
         }
-        
+
         .darkviolet {
             background-color: darkviolet;
+            color: white;
         }
-        
+
         .slateblue {
             background-color: slateblue;
+            color: white;
         }
-        
+
         .greenyellow {
             background-color: greenyellow;
         }
-        
+
         .orange {
             background-color: orange;
         }
-        
+
         .orangered {
             background-color: orangered;
         }
-        
+
         .firebrick {
             background-color: firebrick;
+            color: white;
         }
-        
+
         .lds-ring {
             display: inline-block;
             position: relative;
@@ -92,7 +101,7 @@
             height: 80px;
             top: 25%;
         }
-        
+
         .lds-ring div {
             box-sizing: border-box;
             display: block;
@@ -105,49 +114,49 @@
             animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
             border-color: #fff transparent transparent transparent;
         }
-        
+
         .lds-ring div:nth-child(1) {
             animation-delay: -0.45s;
         }
-        
+
         .lds-ring div:nth-child(2) {
             animation-delay: -0.3s;
         }
-        
+
         .lds-ring div:nth-child(3) {
             animation-delay: -0.15s;
         }
-        
+
         .leaflet-popup-content-wrapper {
             width: 400px !important;
         }
-        
+
         .leaflet-container a.leaflet-popup-close-button {
             padding: 14px 14px 0 0 !important;
             font: 24px/15px Tahoma, Verdana, sans-serif !important;
             font-weight: 300 !important;
         }
-        
+
         .stationName {
             font-size: 1.735rem;
             font-weight: 700;
             text-transform: uppercase;
             margin: 0 !important;
         }
-        
+
         .date {
             font-weight: 400;
             font-size: 0.75rem;
             color: rgb(132, 142, 154);
             margin: 0 !important;
         }
-        
+
         .tempwind {
             display: table;
             width: 366px;
             margin-top: 1em;
         }
-        
+
         .temp,
         .wind,
         .rain,
@@ -157,34 +166,34 @@
             vertical-align: top;
             width: 33%;
         }
-        
+
         .tempvalue,
         .weathervalue {
             font-size: 4em;
             font-weight: 700;
             margin: 0 !important;
         }
-        
+
         .weathervalue {
             font-size: 1.5em;
             font-weight: 500;
         }
-        
+
         .temp {
             width: 60%;
         }
-        
+
         .wind {
             width: 40%;
         }
-        
+
         .subtitle {
             font-size: 0.735rem;
             font-weight: 300;
             text-transform: uppercase;
             color: #555;
         }
-        
+
         .iconrain,
         .iconhumidity,
         .iconpressure,
@@ -194,12 +203,12 @@
             margin-top: 0px;
             margin-right: 5px;
         }
-        
+
         .iconrain {
             stroke-width: 10;
             stroke: #3399ff;
         }
-        
+
         sup {
             font-size: 0.55em;
             margin-left: -0.3em;
@@ -210,22 +219,28 @@
             0% {
                 transform: rotate(0deg);
             }
+
             100% {
                 transform: rotate(360deg);
             }
         }
-        @media only screen and (max-width: 600px)  {
+
+        @media only screen and (max-width: 600px) {
             .leaflet-popup-content-wrapper {
                 transform: scale(0.8);
             }
+
             .leaflet-container a.leaflet-popup-close-button {
                 padding: 32px 48px 0 0 !important;
             }
-            .leaflet-popup, .leaflet-zoom-animated {
-                bottom:-46px !important;
+
+            .leaflet-popup,
+            .leaflet-zoom-animated {
+                bottom: -46px !important;
             }
+
             .leaflet-popup-tip-container {
-                margin-top:-24px;
+                margin-top: -24px;
             }
         }
     </style>
@@ -259,13 +274,15 @@
         let markers = L.markerClusterGroup({
             maxClusterRadius: 50,
             disableClusteringAtZoom: 12,
-            iconCreateFunction: function(cluster) {
+            iconCreateFunction: function (cluster) {
                 const markers = cluster.getAllChildMarkers();
                 let count = 0;
                 let sum = 0;
                 for (const s of markers) {
+                    let val = s.options.data.visibleValue;
+                    if (isNaN(val)) continue;
                     count++;
-                    sum += +s.options.data.visibleValue;
+                    sum += +val;
                 }
 
                 let avgValue = Math.round(sum / count);
@@ -273,7 +290,7 @@
                 return L.divIcon({
                     html: `<div badge="+">${avgValue}</div>`,
                     className: "weather-marker " + tempToColor(avgValue),
-                    iconSize: null,
+                    iconSize: 30,
                 });
             },
         });
@@ -290,7 +307,7 @@
         }
 
         const cardinalStr = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW", "N"]
-            // 360 in 16 slices (22.5 degrees in each slice)
+        // 360 in 16 slices (22.5 degrees in each slice)
         function degreesToCardinal(direction) {
             if (direction == null || typeof direction === 'undefined')
                 return '--';
@@ -299,7 +316,7 @@
             return cardinalStr[Math.round((direction % 360) / 22.5 + 1)];
         }
 
-        secondsToHuman = function(seconds) {
+        secondsToHuman = function (seconds) {
 
             var r = {};
             r.days = Math.floor(seconds / 86400);
@@ -310,7 +327,7 @@
             return r;
         };
 
-        secondsToText = function(seconds, rounded) {
+        secondsToText = function (seconds, rounded) {
             var r = secondsToHuman(seconds);
             var text = "";
 
@@ -383,18 +400,19 @@
         req.open("GET", `/api/v0/stations/data/tight/temp`);
         req.send();
 
-        req.onreadystatechange = function() {
+        req.onreadystatechange = function () {
             document.getElementById("loading").style.display = "none";
             if (this.readyState == 4 && this.status == 200) {
                 const data = JSON.parse(this.responseText);
                 let stationsCount = 0;
                 const features = [];
                 for (const s in data) {
-                    stationsCount++;
-                    const temp = Math.round(data[s][3]);
+                    stationsCount++;                    
+                    let temp = Math.round(data[s][3]);
+                    if (temp > 50 || temp < -50) temp = '!';
 
                     const icon = L.divIcon({
-                        iconSize: null,
+                        iconSize: 30,
                         className: "weather-marker " + tempToColor(temp),
                         html: temp,
                     });
@@ -412,14 +430,14 @@
                 }
                 console.log(stationsCount);
                 map.addLayer(markers);
-                markers.on("click", function(a) {
+                markers.on("click", function (a) {
                     let stationName = a.layer.options.data.title;
                     let req = new XMLHttpRequest();
                     //req.open("GET", `http://${server}:${port}/api/v0/station/${stationName}`);
                     req.open("GET", `/api/v0/station/${stationName}`);
                     req.send();
 
-                    req.onreadystatechange = function() {
+                    req.onreadystatechange = function () {
                         if (this.readyState == 4 && this.status == 200) {
                             try {
                                 const data = JSON.parse(this.responseText);
@@ -459,8 +477,8 @@
                                     <div class='pressure'><svg class='iconpressure' enable-background='new 0 0 512 512' version='1.1' viewBox='0 0 512 512' xml:space='preserve' xmlns='http://www.w3.org/2000/svg'><path d='m257 0c-139.9 0-257 113.02-257 255 0 141.19 116.45 257 257 257 142.13 0 255-117.26 255-257 0-140.94-114.05-255-255-255zm0 482.2c-125.17 0-227.2-102.03-227.2-227.2 0-124.06 102.03-225.2 227.2-225.2 124.06 0 225.2 101.14 225.2 225.2 0 125.17-101.14 227.2-225.2 227.2z' fill='#3399ff'/><path d='m257 60c-107.79 0-197 87.491-197 195 0 52.603 20.817 103.59 57.114 139.89 5.853 5.854 15.356 5.857 21.213 0l21.265-21.265c5.857-5.858 5.857-15.355 0-21.213-5.857-5.857-15.355-5.857-21.213 0l-10.151 10.151c-21.339-25.839-34.552-58.395-37.565-92.559h14.337c8.284 0 15-6.716 15-15s-6.716-15-15-15h-14.303c3.129-34.135 16.816-65.304 37.812-90.277l9.87 9.87c5.857 5.857 15.355 5.858 21.213 0s5.858-15.355 0-21.213l-9.791-9.791c25.428-21.084 57.282-34.829 92.199-37.915v14.326c0 8.284 6.716 15 15 15s15-6.716 15-15v-14.311c33.219 3.008 63.624 15.9 88.248 35.709l-129.3 91.907c-13.116 9.324-20.947 23.041-20.947 36.695 0 1.025 0.038 2.043 0.113 3.053 1.702 23.035 22.481 41.947 46.887 41.947 14.542 0 28.257-7.082 36.694-18.948l91.907-129.3c19.809 24.624 32.702 55.03 35.71 88.249h-14.311c-8.284 0-15 6.716-15 15s6.716 15 15 15h14.334c-3.021 34.114-16.252 66.65-37.617 92.503l-10.096-10.096c-5.858-5.858-15.355-5.858-21.213 0s-5.858 15.355 0 21.213l21.207 21.208c5.854 5.853 15.356 5.858 21.213 0 36.334-36.333 57.172-87.299 57.172-139.83 0-107.5-87.39-195-195-195zm12.242 203.67c-2.817 3.963-7.393 6.329-12.242 6.329-8.738 0-17-7.29-17-15 0-3.782 3.347-8.702 8.328-12.243l72.316-51.402-51.402 72.316z' fill='#3399ff'/><path d='m287 362h-62c-24.813 0-45 20.187-45 45s20.187 45 45 45h62c24.813 0 45-20.187 45-45s-20.187-45-45-45zm0 60h-62c-8.271 0-15-6.729-15-15s6.729-15 15-15h62c8.271 0 15 6.729 15 15s-6.729 15-15 15z' fill='#3399ff'/></svg><span class='subtitle'>Pressure<br></span><p class='weathervalue'>
                                     ${(wx.pressure || '--')} <sup>mb</sup>
                                 </p></div>`
-
-                                let popup = L.popup().setLatLng(a.layer.getLatLng()).setContent(html).openOn(map);
+                                console.log(a.layer.getLatLng())
+                                let popup = L.popup({ offset: [0, -15] }).setLatLng(a.layer.getLatLng()).setContent(html).openOn(map);
                             } catch (e) {
                                 console.log(e);
                             }

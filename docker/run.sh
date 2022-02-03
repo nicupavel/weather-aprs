@@ -4,9 +4,9 @@
 if [ -a ../.env ]
 then
     set -a
-    echo "Loading environment"    
+    echo -n "Loading environment "
     . ../.env
-    echo $PROXY_HTTP_PORT
+    echo " done"
     set +a
 else
     echo "Missing .env file. Please create this file to be able to run this script."
@@ -38,4 +38,6 @@ fi
 
 sudo -E docker-compose build "$@"
 sudo -E docker-compose $docker_opts up
+echo "Open browser and navigate to http://localhost:$PROXY_HTTP_PORT/"
+
 
