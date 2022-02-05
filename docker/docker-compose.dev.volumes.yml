@@ -4,5 +4,8 @@ version: '3.7'
 services:
   proxy:
     volumes:
-      - ../gui:/usr/share/nginx/html/  
+      - ../gui:/usr/share/nginx/html/
+  weather:
+    volumes:
+      - ../:/weather-aprs/
   

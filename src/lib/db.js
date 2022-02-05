@@ -106,7 +106,6 @@ module.exports = (function() {
                 const weather = station.samples[0];
                 res[station.stationName] = [
                     ...station.location.coordinates.map(o => { return o ? parseFloat(o.toFixed(4)) : o }),
-                    weather.timestamp / 1000 >> 0
                 ]
 
                 __conditionalAddWeatherProp("wind_gust", res[station.stationName], keys, weather.wx);
@@ -124,9 +123,14 @@ module.exports = (function() {
         return {};
     }
 
-    function __conditionalAddWeatherProp(name, dest, keysList, keysValues) {
+    function __conditionalAddWeatherProp(name, dest, keysList, keysValues, asFloat = true) {
         if (!keysList || (keysList.indexOf(name) !== -1)) {
-            dest.push(keysValues[name]);
+            let val = keysValues[name];
+            if (asFloat) {
+                val = parseFloat(val);
+                if (isNaN(val)) val = null;
+            }
+            dest.push(val);
         }
     }
 

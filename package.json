@@ -10,6 +10,7 @@
     "author": "Nicu Pavel <npavel@linuxconsulting.ro>",
     "license": "ISC",
     "dependencies": {
+        "aewx-metar-parser": "^0.10.1",
         "basic-ftp": "^4.6.6",
         "dotenv": "^8.2.0",
         "express": "^4.17.1",

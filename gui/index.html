@@ -257,7 +257,15 @@
     </div>
     <div id="mapid" style="width: 100%; height: 98vh; z-index: 0"></div>
     <script>
-        let map = L.map("mapid").setView([47, 27], 3);
+        const swLimit = L.latLng(-90, -200)
+        const neLimit = L.latLng(90, 200)
+        const bounds = L.latLngBounds(swLimit, neLimit)
+
+        let map = L.map("mapid", {
+            minZoom: 3, 
+            maxBoundsViscosity: 1.0,
+            maxBounds: bounds
+        }).setView([47, 27], 3);
 
         // add the OpenStreetMap tiles
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -269,7 +277,7 @@
         DN.addTo(map);
         setInterval(() => {
             DN.setTime();
-        }, 1000);
+        }, 60 * 1000);
 
         let markers = L.markerClusterGroup({
             maxClusterRadius: 50,
@@ -407,9 +415,9 @@
                 let stationsCount = 0;
                 const features = [];
                 for (const s in data) {
-                    stationsCount++;                    
-                    let temp = Math.round(data[s][3]);
-                    if (temp > 50 || temp < -50) temp = '!';
+                    stationsCount++;
+                    let temp = Math.round(data[s][2]);
+                    if (isNaN(temp) || temp > 50 || temp < -50) temp = '!';
 
                     const icon = L.divIcon({
                         iconSize: 30,
