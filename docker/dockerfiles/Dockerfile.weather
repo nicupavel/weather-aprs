@@ -1,4 +1,4 @@
-FROM node:12
+FROM node:14
 WORKDIR /weather-aprs
 COPY src ./src/
 COPY .env index.js package.json package-lock.json ./
