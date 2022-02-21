@@ -19,7 +19,7 @@ then
     while true; do
         read -p "Missing docker-compose. Do you wish to download & install it (y/n) ?" ans
         case $ans in
-            [Yy]* ) sudo curl -L https://github.com/docker/compose/releases/download/v2.2.2/docker-compose-`uname -s`-`uname -m` -
+            [Yy]* ) sudo curl -L https://github.com/docker/compose/releases/download/v2.2.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
                     sudo chmod +x /usr/local/bin/docker-compose;
                 break;;
             * ) exit;;
