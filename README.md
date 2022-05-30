@@ -22,11 +22,12 @@ The easiest way is to run this project through provided docker-compose. This wil
       cd weather-aprs
       cp .env.sample .env
       cd docker
-      ./run.sh
+      ./run.sh --build
 
 The default configuration from ```.env.sample``` file are setup for a docker run environment. If you wish to develop modifications to the sources
 you can export or add to .env: ```DEVELOP_LOCALLY=1```. This will mount the local sources to the containers and run nodemon for reload on save.
 
+ *Note* : `--build` argument is only needed for the first build or on container configuration change.
 
 ## REST API
 

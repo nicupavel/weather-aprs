@@ -37,10 +37,12 @@ if [ ${DEVELOP_LOCALLY} -eq 1 ]; then
     echo "Adding local folders as volumes for development"
     docker_opts="-f docker-compose.yml -f docker-compose.dev.volumes.yml"
 fi
-echo "Interface will be availeble to http://localhost:$PROXY_HTTP_PORT/"
+echo "Interface will be available to http://localhost:$PROXY_HTTP_PORT/"
 
-sudo -E docker-compose build "$@"
-sudo -E docker-compose $docker_opts up
-echo "Open browser and navigate to http://localhost:$PROXY_HTTP_PORT/"
+sudo -E docker-compose $docker_opts stop
+sudo -E docker-compose $docker_opts up "$@" -d
+
+sudo -E docker-compose $docker_opts logs -f
+
 
 

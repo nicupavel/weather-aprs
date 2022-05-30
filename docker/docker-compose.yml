@@ -31,6 +31,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_DB_PASS}
     ports:
       - "${MONGO_DB_PORT}:27017"
+    command: --quiet
     volumes:
       - ./data/mongodb:/data/db
     networks:
