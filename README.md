@@ -10,8 +10,7 @@ Gathers data from APRS and CWOP weather stations around the world. All data is s
 querying all stations or station by name or nearby latitude/longitude location. 
 
 ## Live URL
-[weather.oci.linuxconsulting.ro](http://weather.oci.linuxconsulting.ro) or 
-[ws.labs.rainmachine.com](http://ws.labs.rainmachine.com)
+[weather.oci.linuxconsulting.ro](http://weather.oci.linuxconsulting.ro)
 
 ## UI
 There is a simple UI that shows stations and allow clicking on them for detalied information.
