@@ -1,3 +1,9 @@
+<!--
+Copyright (c) 2023 Linux Consulting
+Author: Nicu Pavel
+License: MIT
+-->
+
 <!DOCTYPE html>
 <html>
 
@@ -9,10 +15,10 @@
     <link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.0/dist/MarkerCluster.Default.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.0/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
 
-    <script src="https://unpkg.com/leaflet.markercluster@1.5.0/dist/leaflet.markercluster.js" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" crossorigin=""></script>
     <script src=" https://unpkg.com/@joergdietrich/leaflet.terminator@1.0.0/L.Terminator.js"></script>
     <style>
         .fullpage-overlay {
@@ -306,10 +312,35 @@
             refreshMarkersData();
         }
 
+        //--------------------------------------------------------------------------------------------------------------
+        // Marker and Map handling
+        //
+
         const swLimit = L.latLng(-90, -200);
         const neLimit = L.latLng(90, 200);
         const bounds = L.latLngBounds(swLimit, neLimit);
         const refreshInterval = 60 * 1000;
+
+        function createIcon(val, isCluster) {
+            return L.divIcon({
+                iconSize: 30,
+                className: "weather-marker " + tempToColor(val),
+                html: isCluster ? `<div badge="+">${val}</div>` : val,
+            });
+        }
+
+        function createMarker(name, lat, lon, val) {
+            const markerData = {
+                title: name,
+                visibleValue: val,
+                location: [lat, lon]
+            };
+
+            return L.marker(new L.LatLng(lat, lon), {
+                icon: createIcon(val),
+                data: markerData,
+            });
+        }
 
         let map = L.map("mapid", {
             minZoom: 3,
@@ -334,10 +365,10 @@
             maxClusterRadius: 50,
             disableClusteringAtZoom: 12,
             iconCreateFunction: function(cluster) {
-                const markers = cluster.getAllChildMarkers();
+                const childMarkers = cluster.getAllChildMarkers();
                 let count = 0;
                 let sum = 0;
-                for (const s of markers) {
+                for (const s of childMarkers) {
                     let val = s.options.data.visibleValue;
                     if (isNaN(val)) continue;
                     count++;
@@ -346,13 +377,40 @@
 
                 let avgValue = Math.round(sum / count);
 
-                return L.divIcon({
-                    html: `<div badge="+">${avgValue}</div>`,
-                    className: "weather-marker " + tempToColor(avgValue),
-                    iconSize: 30,
-                });
+                return createIcon(avgValue, true);
             },
         });
+
+        function refreshMarkersData() {
+            let func = Convert.fahrenheitToCelsius;
+
+            if (!unitsMetric) {
+                func = Convert.celsiusToFahrenheit;
+            }
+
+            for (const s in allMarkers) {
+                allMarkers[s].options.data.visibleValue = func(allMarkers[s].options.data.visibleValue);
+                /*
+                const prevData = {
+                    ...allMarkers[s].options.data
+                }
+                const val = func(prevData.visibleValue);
+
+                const marker = createMarker(
+                    prevData.title,
+                    prevData.location[0],
+                    prevData.location[1],
+                    val
+                );
+                //markers.removeLayer(allMarkers[s]);
+                allMarkers[s] = marker;
+                //markers.addLayer(allMarkers[s]);
+                */
+
+            }
+
+            markers.refreshClusters(allMarkers);
+        }
 
         //--------------------------------------------------------------------------------------------------------------
         // API Calls
@@ -364,7 +422,17 @@
             let req = new XMLHttpRequest();
             //req.open("GET", `http://${server}:${port}/api/v0/stations/data/tight/temp`);
             req.open("GET", `/api/v0/stations/data/tight/temp`);
-            req.onreadystatechange = updateStations
+            req.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    try {
+                        const data = JSON.parse(this.responseText);
+                        updateStations(data);
+                    } catch (err) {
+                        console.error('Error parsing API data');
+                        console.error(err);
+                    }
+                }
+            }
             console.log("Getting temp for all stations");
             req.send();
         }
@@ -381,63 +449,36 @@
         //--------------------------------------------------------------------------------------------------------------
         // API Calls reactive functions
         //
-        allMarkers = {};
+        let allMarkers = {};
 
-        function updateStations() {
+        function updateStations(data) {
             document.getElementById("loading").style.display = "none";
-            if (this.readyState == 4 && this.status == 200) {
-                const data = JSON.parse(this.responseText);
-                const features = [];
-                for (const s in data) {
-                    let temp = Math.round(data[s][2]);
-                    if (isNaN(temp) || temp > 50 || temp < -50) temp = '!';
 
-                    const markerData = {
+            for (const s in data) {
+                let temp = Math.round(data[s][2]);
+                if (isNaN(temp) || temp > 50 || temp < -50) temp = '!';
+
+                if (!(s in allMarkers)) {
+                    const marker = createMarker(s, data[s][1], data[s][0], temp);
+                    allMarkers[s] = marker;
+                    markers.addLayer(allMarkers[s]);
+                } else {
+                    allMarkers[s].icon = createIcon(temp);
+                    allMarkers[s].data = {
                         title: s,
                         visibleValue: temp,
-                    };
-
-                    const icon = L.divIcon({
-                        iconSize: 30,
-                        className: "weather-marker " + tempToColor(temp),
-                        html: temp,
-                    });
-
-                    if (!(s in allMarkers)) {
-                        const marker = L.marker(new L.LatLng(data[s][1], data[s][0]), {
-                            icon: icon,
-                            data: markerData,
-                        });
-
-                        allMarkers[s] = marker;
-                        markers.addLayer(allMarkers[s]);
-                    } else {
-                        allMarkers[s].icon = icon;
-                        allMarkers[s].data = markerData;
-                    }
+                        location: [data[s][1], data[s][0]]
+                    };;
                 }
-                console.log(Object.keys(allMarkers).length);
+            }
+            console.log(`Stations: ${Object.keys(allMarkers).length}`);
 
-                if (!markers.addedToView) {
-                    map.addLayer(markers);
-                    markers.on("click", markerPopup);
-                    markers.addedToView = true;
-                }
+            if (!markers.addedToView) {
+                map.addLayer(markers);
+                markers.on("click", markerPopup);
+                markers.addedToView = true;
             }
         };
-        
-        function refreshMarkersData() {
-            let func = Convert.fahrenheitToCelsius;
-
-            if (!unitsMetric) {
-                func = Convert.celsiusToFahrenheit;
-            }
-
-            for (const s in allMarkers) {
-                allMarkers[s].options.data.visibleValue = func(allMarkers[s].options.data.visibleValue);
-            }
-            markers.refreshClusters();
-        }
 
         function markerPopup(a) {
             let stationName = a.layer.options.data.title;
@@ -450,7 +491,6 @@
                 if (this.readyState == 4 && this.status == 200) {
                     try {
                         const data = JSON.parse(this.responseText);
-                        console.log(data);
                         const wdate = new Date(data.weather.timestamp).toString();
                         const ago = (Date.now() - data.weather.timestamp) / 1000 >> 0;
                         const wx = data.weather.wx;
@@ -500,7 +540,6 @@
                                     ${(wx.pressure || '--')} <sup>mb</sup>
                                 </p>
                             </div>`
-                        console.log(a.layer.getLatLng())
                         let popup = L.popup({
                             offset: [0, -15]
                         }).setLatLng(a.layer.getLatLng()).setContent(html).openOn(map);
@@ -515,6 +554,11 @@
         // Utility
         //
         function tempToColor(temp) {
+
+            if (!unitsMetric) {
+                temp = Convert.fahrenheitToCelsius(temp);
+            }
+
             if (temp < 0) return "darkviolet";
             else if (temp < 10) return "slateblue";
             else if (temp < 20) return "greenyellow";
@@ -627,7 +671,7 @@
                 }
 
                 try {
-                    switch(type) {
+                    switch (type) {
                         case 'gust':
                             return Convert.msToKnots(val);
                             break;
@@ -646,7 +690,7 @@
                 };
                 return '--'
             },
-            units: function(type) {                
+            units: function(type) {
                 const metricUnits = {
                     gust: 'm/s',
                     wind: 'km/h',
@@ -659,7 +703,7 @@
                     wind: 'mph',
                     rain: 'in',
                     temp: '°F'
-                };                
+                };
 
                 return unitsMetric ? metricUnits[type] : imperialUnits[type];
             }
