@@ -12,6 +12,7 @@
     "dependencies": {
         "aewx-metar-parser": "^0.10.1",
         "basic-ftp": "^4.6.6",
+        "compression": "^1.7.4",
         "dotenv": "^8.2.0",
         "express": "^4.17.1",
         "js-aprs-fap": "^1.1.1",

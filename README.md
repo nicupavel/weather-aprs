@@ -45,3 +45,7 @@ Data returned is an object with the format:
 
 - ```GET /api/v0/station/:name``` - return data for specified station name
 - ```GET /api/v0/nearby/:lat/:lon/:dist``` - returns nearby stations by the specified longitude, latitude and distance
+
+## Mongo DB unclean shutdown
+
+            sudo docker-compose --env-file ../.env run mongodb mongod --repair

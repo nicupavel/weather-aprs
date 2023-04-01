@@ -225,7 +225,7 @@ module.exports = (function() {
                     day: today
                 }
             };
-            console.log(`${object.aprsSource}:${stationName}`);
+            // console.log(`${object.aprsSource}:${stationName}`);
             const result = await stationData.updateOne(filter, data, options);
         } catch (e) {
             console.error(e);

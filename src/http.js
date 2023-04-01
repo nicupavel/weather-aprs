@@ -2,9 +2,11 @@ const apiV0 = require('./routes/v0/api.js')
 const Express = require('express');
 const HttpUtils = require('./lib/http-utils');
 const Config = require("./config");
+const Compression = require('compression')
 
 function init() {
     let apiServer = Express();
+    apiServer.use(Compression())
     apiServer.use(HttpUtils.allowCORS);
     apiServer.use(Express.json());
     apiServer.use("/api/v0/", apiV0);
