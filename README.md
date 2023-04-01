@@ -1,19 +1,23 @@
 
 # Weather Aprs
-Live Weather Data obtained from APRS stations
+Live Weather Data obtained from APRS and CWOP stations.
 
-![weather-aprs](https://user-images.githubusercontent.com/1650801/148747243-a81ec086-5eb3-473c-baa2-c46300654ae1.png)
+![weather-aprs](https://user-images.githubusercontent.com/1650801/229296970-5da3d78c-d549-4807-b75c-94cddd6d5a2e.gif)
 
 ## What it does
-
-Gathers data from APRS and CWOP weather stations around the world. All data is saved in a MongoDB. REST API for
-querying all stations or station by name or nearby latitude/longitude location. 
+Continously gathers live weather data from APRS and CWOP stations around the world. 
 
 ## Live URL
 [weather.oci.linuxconsulting.ro](http://weather.oci.linuxconsulting.ro)
 
 ## UI
-There is a simple UI that shows stations and allow clicking on them for detalied information.
+There is a simple UI that shows stations data: temperature, wind, precipitation for the last 24 hours, humidity and pressure over world-map overlay.
+Clicking on markers shows detailed information about the station and weather data.
+
+## Technical details
+
+Data is saved in a Mongo DB with a default historical limit of 1 year of previous observations. 
+REST API for querying all stations or station by name or nearby latitude/longitude location (see below). 
 
 ## Running
 The easiest way is to run this project through provided docker-compose. This will setup the entire "stack" and required modules.
@@ -45,7 +49,3 @@ Data returned is an object with the format:
 
 - ```GET /api/v0/station/:name``` - return data for specified station name
 - ```GET /api/v0/nearby/:lat/:lon/:dist``` - returns nearby stations by the specified longitude, latitude and distance
-
-## Mongo DB unclean shutdown
-
-            sudo docker-compose --env-file ../.env run mongodb mongod --repair
