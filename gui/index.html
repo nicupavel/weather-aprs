@@ -12,9 +12,9 @@ License: MIT
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="description" content="Real observed meteo weather data from weather APRS stations with a worldwide glance view"/>
         <meta name="robots" content="index, noarchive"/>
-        
+        <link rel="icon" href="favicon.ico">
+        <link rel="apple-touch-icon" sizes="63x68" href="icon.png">
         <link rel="canonical" href="https://meteoglance.com"/>
-        <link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
         <link
             rel="stylesheet"
             href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
@@ -40,15 +40,21 @@ License: MIT
             }
 
             .fullpage-overlay {
-                opacity: 0.3;
-                background: #000;
+                opacity: 0.8;
+                background: #fff;
                 width: 100%;
                 height: 100%;
-                z-index: 10;
+                z-index: 200;
                 top: 0;
                 left: 0;
                 position: fixed;
                 text-align: center;
+            }
+
+            .fullpage-overlay > svg {
+                position: absolute;
+                top: calc(50% - 66px);
+                left: calc(50% - 61px);
             }
 
             .weather-marker {
@@ -202,39 +208,6 @@ License: MIT
             .humidity_5 {
                 background-color: deeppink;
                 color: white;
-            }
-
-            .lds-ring {
-                display: inline-block;
-                position: relative;
-                width: 80px;
-                height: 80px;
-                top: 25%;
-            }
-
-            .lds-ring div {
-                box-sizing: border-box;
-                display: block;
-                position: absolute;
-                width: 64px;
-                height: 64px;
-                margin: 8px;
-                border: 8px solid #fff;
-                border-radius: 50%;
-                animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-                border-color: #fff transparent transparent transparent;
-            }
-
-            .lds-ring div:nth-child(1) {
-                animation-delay: -0.45s;
-            }
-
-            .lds-ring div:nth-child(2) {
-                animation-delay: -0.3s;
-            }
-
-            .lds-ring div:nth-child(3) {
-                animation-delay: -0.15s;
             }
 
             .leaflet-popup-content-wrapper {
@@ -392,16 +365,6 @@ License: MIT
                 background-color: white;
             }
 
-            @keyframes lds-ring {
-                0% {
-                    transform: rotate(0deg);
-                }
-
-                100% {
-                    transform: rotate(360deg);
-                }
-            }
-
             @media only screen and (max-width: 600px) {
                 .leaflet-popup-content-wrapper {
                     transform: scale(0.8);
@@ -480,13 +443,53 @@ License: MIT
             </div>
         </nav>
         <main>
-            <div id="loading" class="fullpage-overlay">
-                <div  class="lds-ring">
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                </div>
+            <div id="loading" class="fullpage-overlay">   
+                <svg width="169.33" height="97" viewBox="0 0 169 96">
+                    <g>
+                        <g>
+                            <g>
+                                <path
+                                    d="M89.91,5.85,90.55,0C100.6,4.68,107.76,11.73,111,22.53l4.64-2.06c1.3,11.05-1.28,20.73-8.68,29.15l4.79,3c-8.67,7-18.24,10.23-29.44,8.56,0,1-.11,1.71-.13,2.45s0,1.36,0,2.56c-11.05-4.49-18.68-11.65-22.29-23l-5.68,2.66c-1.28-11.72,1.55-21.79,10-30.37l-5.08-4C68.61,5.14,78.57,2.7,89.91,5.85ZM83.33,19.79c6.14-4.23,12.24-3.77,18.77-2.1C90.21,10.37,71.15,20.5,72.22,35.44,67.83,29,68,22.48,70,15.77c-2.49,4.82-3.55,9.92-1.76,15.12,3.09,9,9.08,14.7,19.26,15.34a29.57,29.57,0,0,1-8,3.14c-2.8.48-5.74.1-8.69.1,5.65,1.92,11.26,1.84,16.41-1.06C94,44.6,98.44,39.07,98.38,30.57A30.46,30.46,0,0,1,101.64,39c.49,2.9.1,5.94.1,8.4C106.93,35.69,97.09,20,83.33,19.79Z"
+                                    style="fill: #b5a0cd"
+                                >
+                                    <animateTransform attributeType="xml"
+                                        attributeName="transform"
+                                        type="rotate"
+                                        from="0 84.5 32"
+                                        to="360 84.5 32"
+                                        dur="1.5s"
+                                        repeatCount="indefinite"/>
+                                </path>
+                                <g>
+                                    <path
+                                        d="M0,96.37V78.61H5.77L9.36,85.5l3.51-6.89h5.85V96.37H15.13V83.21h-.36l-3.72,7.72H7.67L4,83.21H3.59V96.37Z"
+                                        style="fill: #b5a0cd" />
+                                    <path d="M22,96.37V78.61H33.8v3H25.59v4.32h8.18v2.94H25.59v4.52H33.8v3Z" style="fill: #b5a0cd" />
+                                    <path d="M39.76,96.37V81.65H35v-3H48v3H43.35V96.37Z" style="fill: #b5a0cd" />
+                                    <path d="M49.92,96.37V78.61H61.73v3H53.51v4.32H61.7v2.94H53.51v4.52h8.22v3Z"
+                                        style="fill: #b5a0cd" />
+                                    <path
+                                        d="M71,96.66a8.67,8.67,0,0,1-4.48-1,5.6,5.6,0,0,1-2.37-3,15.32,15.32,0,0,1-.71-5.07,15.71,15.71,0,0,1,.71-5.13,5.75,5.75,0,0,1,2.37-3.09,8.37,8.37,0,0,1,4.48-1,8.41,8.41,0,0,1,4.49,1,5.68,5.68,0,0,1,2.36,3.09,15.68,15.68,0,0,1,.72,5.13,15.5,15.5,0,0,1-.72,5.12,5.4,5.4,0,0,1-2.36,3A8.82,8.82,0,0,1,71,96.66Zm0-3A4,4,0,0,0,73.5,93a3.35,3.35,0,0,0,1.13-2,17,17,0,0,0,.28-3.39,16.5,16.5,0,0,0-.3-3.42,3.66,3.66,0,0,0-7.21,0,18.94,18.94,0,0,0,0,6.77,3.47,3.47,0,0,0,1.14,2A3.84,3.84,0,0,0,71,93.64Z"
+                                        style="fill: #b5a0cd" />
+                                    <path
+                                        d="M88.17,96.63a10,10,0,0,1-3.69-.58,4.9,4.9,0,0,1-2.27-1.75,7.2,7.2,0,0,1-1.16-2.86,19.94,19.94,0,0,1-.34-3.94,19.5,19.5,0,0,1,.38-4.09,7.09,7.09,0,0,1,1.25-2.86,5.19,5.19,0,0,1,2.28-1.69,9.69,9.69,0,0,1,3.5-.56,21.84,21.84,0,0,1,2.23.12c.77.08,1.5.17,2.21.3s1.28.24,1.75.36l0,2.81c-.49-.09-1.07-.17-1.76-.24s-1.38-.12-2.09-.16-1.35-.07-1.92-.07a5.5,5.5,0,0,0-2.12.34,2.45,2.45,0,0,0-1.25,1.08,5.13,5.13,0,0,0-.59,1.9,21.81,21.81,0,0,0-.15,2.76,16.3,16.3,0,0,0,.3,3.42,3.28,3.28,0,0,0,1.17,2,4.15,4.15,0,0,0,2.51.65l.89,0c.32,0,.64,0,.94-.07s.56-.07.77-.11V89.51H88.85V86.78h5.51V96L93,96.15c-.53.08-1.09.15-1.67.22l-1.69.18A13.27,13.27,0,0,1,88.17,96.63Z"
+                                        style="fill: #b5a0cd" />
+                                    <path d="M97.33,96.37V78.61h3.58V93.33h7v3Z" style="fill: #b5a0cd" />
+                                    <path
+                                        d="M108.53,96.37l4.53-17.76h6.27l4.49,17.76h-3.58l-1-3.59H113l-.93,3.59Zm5.07-6.47h5.13l-2-8.38h-1.09Z"
+                                        style="fill: #b5a0cd" />
+                                    <path d="M125.77,96.37V78.61h4.68l5.7,12.48h.47V78.61h3.59V96.37h-4.63l-5.75-12.69h-.47V96.37Z"
+                                        style="fill: #b5a0cd" />
+                                    <path
+                                        d="M149.88,96.66a9.22,9.22,0,0,1-3.42-.54,4.53,4.53,0,0,1-2.12-1.65,7,7,0,0,1-1.08-2.84,28.65,28.65,0,0,1,0-8.27,7,7,0,0,1,1.08-2.85,4.61,4.61,0,0,1,2.15-1.66A9.35,9.35,0,0,1,150,78.3a16.28,16.28,0,0,1,1.8.1c.62.07,1.22.16,1.8.25s1.08.2,1.5.3L155,81.81c-.34-.07-.78-.13-1.3-.19s-1-.11-1.58-.15-1,0-1.51,0a5.52,5.52,0,0,0-2,.31,2.46,2.46,0,0,0-1.21,1,5.14,5.14,0,0,0-.58,1.89,25.2,25.2,0,0,0,0,5.67,5,5,0,0,0,.57,1.87,2.42,2.42,0,0,0,1.21,1,5.49,5.49,0,0,0,2.07.32c.69,0,1.46,0,2.3-.11l2.09-.22.08,2.83c-.42.09-.91.18-1.48.27s-1.18.18-1.82.24S150.5,96.66,149.88,96.66Z"
+                                        style="fill: #b5a0cd" />
+                                    <path d="M157.52,96.37V78.61h11.81v3h-8.22v4.32h8.19v2.94h-8.19v4.52h8.22v3Z"
+                                        style="fill: #b5a0cd" />
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </svg>
             </div>
             <div id="mapid" style="width: 100%; height: 98vh; z-index: 0"></div>
         </main>
@@ -659,12 +662,13 @@ License: MIT
             //--------------------------------------------------------------------------------------------------------------
             // API Calls
             //
-            const server = "127.0.0.1";
-            const port = 9090;
+            const server = "https://meteoglance.com";
+            const port = null;
+            const apiHost = `${server}${port?`:${port}`:''}`;
 
             function apiGetWeatherData() {
                 let req = new XMLHttpRequest();
-                req.open("GET", `/api/v0/stations/data/tight/wind_speed,temp,rain_24h,humidity`);
+                req.open("GET", `${apiHost}/api/v0/stations/data/tight/wind_speed,temp,rain_24h,humidity`);
                 req.onreadystatechange = function () {
                     if (this.readyState == 4 && this.status == 200) {
                         try {
@@ -722,7 +726,7 @@ License: MIT
             function markerPopup(a) {
                 let stationName = a.layer.options.data.title;
                 let req = new XMLHttpRequest();
-                req.open("GET", `/api/v0/station/${stationName}`);
+                req.open("GET", `${apiHost}/api/v0/station/${stationName}`);
                 req.send();
 
                 req.onreadystatechange = function () {
