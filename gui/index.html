@@ -314,6 +314,8 @@ License: MIT
                 top: 18px;
                 right: 10px;
                 display: flex;
+                flex-wrap: wrap-reverse;
+                justify-content: center;
                 column-gap: 7px;
             }
 
@@ -367,7 +369,8 @@ License: MIT
 
             @media only screen and (max-width: 600px) {
                 nav {
-                    top: calc(100% - 60px);
+                    top: auto;
+                    bottom: 20px;
                 }
 
                 .leaflet-popup-content-wrapper {
