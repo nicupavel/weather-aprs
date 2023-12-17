@@ -289,11 +289,10 @@ License: MIT
 
             .iconsmall {
                 width: 23px;
-                margin-left: 6px;
                 margin-top: 3px;
                 fill: #3399ff;
             }
-
+            
             .iconrain {
                 stroke-width: 10;
                 stroke: #3399ff;
@@ -310,11 +309,17 @@ License: MIT
                 color: #555;
             }
 
-            #container__types, #container__units {
+            nav {
                 position: absolute;
-                top: 15px;
-                right: 130px;
+                top: 18px;
+                right: 10px;
                 display: flex;
+                column-gap: 7px;
+            }
+
+            .container__buttons {
+                display: flex;
+                column-gap: 3px;
                 height: 30px;
                 z-index: 100;
                 font-weight: bold;
@@ -324,11 +329,6 @@ License: MIT
                 border-radius: 4px;
                 padding: 5px;
                 cursor: pointer;
-            }
-
-            #container__units {
-                right: 30px;
-                width: 80px;
             }
 
             .unit {
@@ -366,6 +366,10 @@ License: MIT
             }
 
             @media only screen and (max-width: 600px) {
+                nav {
+                    top: calc(100% - 60px);
+                }
+
                 .leaflet-popup-content-wrapper {
                     transform: scale(0.8);
                 }
@@ -387,11 +391,20 @@ License: MIT
     </head>
     <body>        
         <nav>
-            <div id="container__units" onclick="unitsChange()">
+            <div class="container__buttons">
+                <button class="unit" onClick="locationChange()" aria-label="Set map to your current location">
+                    <abbr title="Set map to your current location">
+                        <svg class="iconsmall" viewBox="0 0 256 256" id="Flat" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M127.99414,15.9971a88.1046,88.1046,0,0,0-88,88c0,75.29688,80,132.17188,83.40625,134.55469a8.023,8.023,0,0,0,9.1875,0c3.40625-2.38281,83.40625-59.25781,83.40625-134.55469A88.10459,88.10459,0,0,0,127.99414,15.9971ZM128,72a32,32,0,1,1-32,32A31.99909,31.99909,0,0,1,128,72Z"/>
+                        </svg>
+                    </abbr>
+                </button>
+            </div>
+            <div class="container__buttons" onclick="unitsChange()">
                 <button class="unit" data-selected="1">°C</button>
                 <button class="unit" data-selected="0">°F</button>
             </div>
-            <div id="container__types">
+            <div class="container__buttons">
                 <button class="unit" data-type-selected="0" onclick="typeChange(this, 'rain_24h')" aria-label="View Rain Data">
                     <abbr title="Rain in last 24h in mm or inches">
                         <svg class="iconrain iconsmall" viewBox="0 0 511.8 511.8">
@@ -508,6 +521,14 @@ License: MIT
                 humidity: 5,
             };
 
+            function locationChange() {
+                Location.get((err, lat, lon) => {
+                    if (!err) {
+                        map.setView(L.latLng(lat, lon), 10);
+                    }                    
+                });
+            }
+
             function unitsChange() {
                 unitsMetric = !unitsMetric;
                 const elems = document.querySelectorAll("[data-selected]");
@@ -586,7 +607,7 @@ License: MIT
                 minZoom: 3,
                 maxBoundsViscosity: 1.0,
                 maxBounds: bounds,
-            }).setView([47, 27], 3);
+            }).setView(L.latLng(47, 27), 3);
             
             map.attributionControl.setPrefix('© Nicu Pavel MeteoGlance');
 
@@ -833,7 +854,7 @@ License: MIT
             }
 
             function secondsToHuman(seconds) {
-                var r = {};
+                let r = {};
                 r.days = Math.floor(seconds / 86400);
                 r.hours = Math.floor((seconds % 86400) / 3600);
                 r.minutes = Math.floor(((seconds % 86400) % 3600) / 60);
@@ -843,8 +864,8 @@ License: MIT
             }
 
             function secondsToText(seconds, rounded) {
-                var r = secondsToHuman(seconds);
-                var text = "";
+                let r = secondsToHuman(seconds);
+                let text = "";
 
                 if (rounded === undefined) {
                     rounded = false;
@@ -1018,6 +1039,34 @@ License: MIT
 
                     return unitsMetric ? metricUnits[type] : imperialUnits[type];
                 },
+            };
+
+            const Location = {
+                callback: null,
+                options: {
+                    enableHighAccuracy: true,
+                    timeout: 5000,
+                    maximumAge: 10 * 60 * 1000,
+                },
+                success: function(pos) {
+                    const c = pos.coords;
+                    console.log(`Latitude : ${c.latitude}`);
+                    console.log(`Longitude: ${c.longitude}`);
+                    console.log(`More or less ${c.accuracy} meters.`);
+                    if (Location.callback) {
+                        Location.callback(null, c.latitude, c.longitude);
+                    }                                        
+                },
+                error: function(err) {
+                    console.warn(`ERROR(${err.code}): ${err.message}`);
+                    if (Location.callback) {
+                        callback(err);
+                    }                    
+                },
+                get: function(callback) {
+                    Location.callback = callback;
+                    navigator.geolocation.getCurrentPosition(Location.success, Location.error, Location.options);
+                }
             };
         </script>
     </body>
