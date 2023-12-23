@@ -1,13 +1,17 @@
 
-# Weather Aprs
-Live Weather Data obtained from APRS and CWOP stations.
+# Weather Aprs (MeteoGlance)
+Shows a world-wide view of **live, observed** Weather Data obtained from APRS and CWOP stations.
 
 ![weather-aprs](https://user-images.githubusercontent.com/1650801/229296970-5da3d78c-d549-4807-b75c-94cddd6d5a2e.gif)
 
 ## What it does
 Continously gathers live weather data from APRS and CWOP stations around the world. 
 
-## Live URL
+## Live URLs
+[meteoglance.com](https://meteoglance.com)
+
+or
+
 [weather.oci.linuxconsulting.ro](http://weather.oci.linuxconsulting.ro)
 
 ## UI
@@ -16,7 +20,7 @@ Clicking on markers shows detailed information about the station and weather dat
 
 ## Technical details
 
-Data is saved in a Mongo DB with a default historical limit of 1 year of previous observations. 
+Unstructured data is saved in a Mongo DB with a default historical limit of 1 year of previous observations. 
 REST API for querying all stations or station by name or nearby latitude/longitude location (see below). 
 
 ## Running
