@@ -1,11 +1,12 @@
 # Override for mounting local sources to container
-# Caveat: node, node-modules should have the same version as in container
-version: '3.7'
+# Keep node_modules from the image; only mount files used during development.
 services:
   proxy:
     volumes:
       - ../gui:/usr/share/nginx/html/
   weather:
     volumes:
-      - ../:/weather-aprs/
+      - ../src:/weather-aprs/src
+      - ../index.js:/weather-aprs/index.js
+      - ../.env:/weather-aprs/.env
   

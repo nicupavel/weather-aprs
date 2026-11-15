@@ -14,17 +14,30 @@ else
     exit 1
 fi
 
-if ! command -v docker-compose &>/dev/null
-then
+if ! docker compose version &>/dev/null && ! command -v docker-compose &>/dev/null; then
     while true; do
-        read -p "Missing docker-compose. Do you wish to download & install it (y/n) ?" ans
+        read -p "Missing Docker Compose. Do you wish to download & install it (y/n)? " ans
         case $ans in
-            [Yy]* ) sudo curl -L https://github.com/docker/compose/releases/download/v2.2.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-                    sudo chmod +x /usr/local/bin/docker-compose;
+            [Yy]* )
+                echo "Installing Docker Compose plugin..."
+                sudo apt-get update && sudo apt-get install -y docker-compose-plugin
                 break;;
-            * ) exit;;
+            [Nn]* )
+                echo "Installation cancelled."
+                exit 1;;
+            * )
+                echo "Please answer y or n.";;
         esac
     done
+fi
+
+if docker compose version &>/dev/null; then
+    export COMPOSE_CMD="docker compose"
+elif command -v docker-compose &>/dev/null; then
+    export COMPOSE_CMD="docker-compose"
+else
+    echo "Error: Docker Compose installation failed or was not found."
+    exit 1
 fi
 
 docker_opts=""
@@ -39,10 +52,10 @@ if [ ${DEVELOP_LOCALLY} -eq 1 ]; then
 fi
 echo "Interface will be available to http://localhost:$PROXY_HTTP_PORT/"
 
-sudo -E docker-compose $docker_opts stop
-sudo -E docker-compose $docker_opts up "$@" -d
+$COMPOSE_CMD $docker_opts stop
+$COMPOSE_CMD $docker_opts up "$@" -d
 
-sudo -E docker-compose $docker_opts logs -f
+$COMPOSE_CMD $docker_opts logs -f
 
 
 

@@ -686,10 +686,15 @@ License: MIT
             //--------------------------------------------------------------------------------------------------------------
             // API Calls
             //
-            const server = "https://meteoglance.com";
+            // Prod
+            //const server = "https://meteoglance.com";
+            //const port = null;
+            //const apiHost = '';
+
+            // Dev
+            const server = "";
             const port = null;
-            //const apiHost = `${server}${port?`:${port}`:''}`;
-            const apiHost = '';
+            const apiHost = `${server}${port?`:${port}`:''}`;
 
             function apiGetWeatherData() {
                 let req = new XMLHttpRequest();
