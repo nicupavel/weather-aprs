@@ -59,7 +59,7 @@ module.exports = (function() {
         return {};
     }
 
-    async function getStationHistory(stationName, period) {
+    async function getStationHistory(stationName, period, options = {}) {
         const hour = 60 * 60 * 1000;
         const periods = {
             day: { duration: 24 * hour, bucket: hour / 4, interval: "15-minute" },
@@ -70,20 +70,44 @@ module.exports = (function() {
         if (!Object.keys(periods).includes(period)) return { statusCode: 400, error: "Choose day, week, month or year." };
         const range = periods[period];
 
-        const to = Date.now();
+        // Keep one fixed end time while the client works backwards through pages.
+        const to = options.to === undefined ? Date.now() : Number(options.to);
         const from = to - range.duration;
-        const firstDay = new Date(new Date(from).setUTCHours(0, 0, 0, 0));
+        const before = options.before === undefined ? to : Number(options.before);
+        if (!Number.isSafeInteger(to) || to <= 0 || to > Date.now() ||
+            !Number.isSafeInteger(before) || before > to || before <= from) {
+            return { statusCode: 400, error: "Invalid history time range." };
+        }
+
+        const day = 24 * hour;
+        const oldest = await stationData.findOne({ stationName }, {
+            projection: { _id: 0, day: 1 }, sort: { day: 1 }
+        });
+        const availableFrom = oldest ? Math.max(from, oldest.day.getTime()) : to;
+        const metadata = { stationName, period, from, to, availableFrom, bucket: range.bucket, interval: range.interval };
+        if (before <= availableFrom) return { ...metadata, chunkFrom: availableFrom, next: null, points: [] };
+
+        // Longer views use at most seven UTC days per request. Boundaries align
+        // with every chart bucket, so pages never split or duplicate a bucket.
+        const chunkFrom = range.duration <= 7 * day ? from :
+            Math.max(availableFrom, Math.floor((before - 1) / day) * day - 6 * day);
+        const firstDay = new Date(new Date(chunkFrom).setUTCHours(0, 0, 0, 0));
         const fields = ["temp", "wind_speed", "wind_gust", "rain_24h", "humidity", "pressure"];
         const values = {};
         for (const key of fields) {
             values[key] = { $convert: { input: `$samples.wx.${key}`, to: "double", onError: null, onNull: null } };
         }
 
-        const points = await stationData.aggregate([
-            { $match: { stationName, day: { $gte: firstDay, $lte: new Date(to) } } },
-            { $project: { samples: 1 } },
+        const cursor = stationData.aggregate([
+            { $match: { stationName, day: { $gte: firstDay, $lt: new Date(before) } } },
+            { $project: { samples: { $filter: {
+                input: "$samples", as: "sample",
+                cond: { $and: [
+                    { $gte: ["$$sample.timestamp", chunkFrom] },
+                    { $lt: ["$$sample.timestamp", before] }
+                ] }
+            } } } },
             { $unwind: "$samples" },
-            { $match: { "samples.timestamp": { $gte: from, $lte: to } } },
             { $project: { timestamp: "$samples.timestamp", ...values } },
             { $group: {
                 _id: { $multiply: [{ $floor: { $divide: ["$timestamp", range.bucket] } }, range.bucket] },
@@ -97,9 +121,11 @@ module.exports = (function() {
             } },
             { $sort: { _id: 1 } },
             { $project: { _id: 0, timestamp: "$_id", count: 1, temp: 1, wind_speed: 1, wind_gust: 1, rain_24h: 1, humidity: 1, pressure: 1 } },
-        ]).toArray();
+        ], { hint: { stationName: 1, day: -1 }, maxTimeMS: 20000 });
+        if (options.onCursor) options.onCursor(cursor);
+        const points = await cursor.toArray();
 
-        return { stationName, period, from, to, bucket: range.bucket, interval: range.interval, points };
+        return { ...metadata, chunkFrom, next: chunkFrom > availableFrom ? chunkFrom : null, points };
     }
 
     async function getAllStations() {

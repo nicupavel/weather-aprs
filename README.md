@@ -56,5 +56,5 @@ Data returned is an object with the format:
 
 - ```GET /api/v0/station/:name``` - returns data for specified station name
 - `GET /api/v0/station/:name/history?period=day` - historical readings for one station. Periods: `day` (24 hours), `week` (7 days), `month` (30 days), and `year` (365 days).
-  returns `points` ordered by bucket timestamp, using 15-minute, hourly, 6-hour, or daily buckets respectively. `point` contains a sample `count`, average temperature/wind speed/humidity/pressure, and peak gust/rolling day rain.
+  returns `points` ordered by bucket timestamp, using 15-minute, hourly, 6-hour, or daily buckets respectively. `point` contains a sample `count`, average temperature/wind speed/humidity/pressure, and peak gust/rolling day rain.  Month and year views are paginated with seven days per request. Next chunk are older measurements. Request next page using the previous response: `to=<response.to>&before=<response.next>`.
 - ```GET /api/v0/nearby/:lat/:lon/:dist``` - returns nearby stations by the specified longitude, latitude and distance

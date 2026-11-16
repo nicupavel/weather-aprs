@@ -1,9 +1,11 @@
-// History stays separate from the map: one request, then small SVG charts.
+// Load recent history first, then extend the charts with older JSON pages.
 const History = {
     data: null,
     request: null,
     station: null,
     period: 'day',
+    loading: false,
+    error: null,
     metrics: [
         { key: 'temp', title: 'Temperature', color: '#cc7045' },
         { key: 'wind_speed', title: 'Wind speed', color: '#278d87' },
@@ -27,6 +29,7 @@ const History = {
     cancel() {
         this.request?.abort();
         this.data = null;
+        this.loading = false;
     },
 
     async load(period) {
@@ -35,6 +38,8 @@ const History = {
         this.request = request;
         this.period = period;
         this.data = null;
+        this.loading = true;
+        this.error = null;
         document.querySelectorAll('[data-period]').forEach(button => {
             button.setAttribute('aria-pressed', button.dataset.period === period);
         });
@@ -44,31 +49,61 @@ const History = {
         charts.replaceChildren();
         charts.setAttribute('aria-busy', 'true');
         try {
-            const response = await fetch(`${apiHost}/api/v0/station/${encodeURIComponent(this.station)}/history?period=${period}`, { signal: request.signal });
-            if (!response.ok) throw new Error('Could not load history.');
-            this.data = await response.json();
-            this.render();
+            let next = null;
+            do {
+                const query = new URLSearchParams({ period });
+                if (next !== null) {
+                    query.set('to', this.data.to);
+                    query.set('before', next);
+                }
+                const response = await fetch(`${apiHost}/api/v0/station/${encodeURIComponent(this.station)}/history?${query}`, { signal: request.signal });
+                if (!response.ok) throw new Error('Could not load history.');
+                const page = await response.json();
+                if (request.signal.aborted) return;
+                this.data = { ...page, points: [...page.points, ...(this.data?.points || [])] };
+                next = page.next ?? null;
+                this.render();
+            } while (next !== null && !request.signal.aborted);
         } catch (error) {
-            if (error.name !== 'AbortError') description.textContent = 'Could not load history. Select a period to try again.';
+            if (!request.signal.aborted) {
+                this.error = this.data?.points.length
+                    ? 'Older observations could not be loaded. Showing partial history. Select a period to retry.'
+                    : 'Could not load history. Select a period to try again.';
+            }
         } finally {
-            if (this.request === request) charts.setAttribute('aria-busy', 'false');
+            if (this.request === request) {
+                this.loading = false;
+                charts.setAttribute('aria-busy', 'false');
+                this.render();
+            }
         }
     },
 
     render() {
-        if (!this.data) return;
-        const { points, interval } = this.data;
-        const charts = document.getElementById('history-charts');
         const description = document.getElementById('history-description');
+        if (!this.data) {
+            if (this.error) description.textContent = this.error;
+            return;
+        }
+        const { points, interval, to, chunkFrom, availableFrom } = this.data;
+        const charts = document.getElementById('history-charts');
+        const dialog = document.getElementById('history-dialog');
+        const scrollTop = dialog.scrollTop;
         charts.replaceChildren();
+        const day = 24 * 60 * 60 * 1000;
+        const total = Math.max(1, Math.ceil((to - availableFrom) / day));
+        const loaded = Math.min(total, Math.ceil((to - chunkFrom) / day));
+        const progress = this.loading ? `Loading history: ${loaded} of ${total} days…` : '';
         if (!points.length) {
-            description.textContent = 'No observations for this station in this period. Try a longer range.';
+            description.textContent = this.error || progress || 'No observations for this station in this period. Try a longer range.';
             return;
         }
         const date = timestamp => new Date(timestamp).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         const count = points.reduce((sum, point) => sum + point.count, 0);
         description.textContent = `${date(points[0].timestamp)} – ${date(points.at(-1).timestamp)} · ${count.toLocaleString()} observations · ${interval.toLowerCase()} averages / peaks`;
+        if (progress || this.error) description.textContent += ` · ${this.error || progress}`;
         for (const metric of this.metrics) charts.append(this.chart(metric));
+        dialog.scrollTop = scrollTop;
     },
 
     linePath(points, smooth) {

@@ -13,11 +13,26 @@ async function getStationByName(req, res) {
 }
 
 async function getStationHistory(req, res) {
+    let cursor;
+    const stopQuery = () => {
+        if (cursor) cursor.close().catch(error => console.error("Could not close history query", error));
+    };
+    res.once("close", stopQuery);
     try {
-        return httpJSONResponse(res, await DB.getStationHistory(req.params.name, req.query.period || "day"));
+        const history = await DB.getStationHistory(req.params.name, req.query.period || "day", {
+            to: req.query.to, before: req.query.before,
+            onCursor: value => {
+                cursor = value;
+                if (res.destroyed) stopQuery();
+            }
+        });
+        if (!res.destroyed) return httpJSONResponse(res, history);
     } catch (error) {
+        if (res.destroyed) return;
         console.error("Could not load station history", error);
-        return res.status(500).json({ error: "Could not load station history." });
+        return res.status(error.code === 50 ? 504 : 500).json({ error: "Could not load station history." });
+    } finally {
+        res.removeListener("close", stopQuery);
     }
 }
 
