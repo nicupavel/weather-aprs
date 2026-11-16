@@ -18,6 +18,7 @@ services:
 
   weather:
     image: weather
+    restart: unless-stopped
     hostname: weather
     build:
       context: ../

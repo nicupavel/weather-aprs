@@ -2,6 +2,5 @@ FROM node:14
 WORKDIR /weather-aprs
 COPY src ./src/
 COPY .env index.js package.json package-lock.json ./
-RUN npm install forever -g && \
-    npm install
-CMD ["forever", "/weather-aprs/index.js"]
+RUN npm install
+CMD ["node", "/weather-aprs/index.js"]
