@@ -62,9 +62,29 @@ License: MIT
                 <button class="close" onclick="closeStation()" aria-label="Close station details">×</button>
                 <h1 id="station-name"></h1>
                 <div id="station-details" aria-live="polite"></div>
+                <button id="history-button" class="history-button" onclick="History.show()">
+                    <svg class="control-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M6 15l4-5 4 3 6-8"/></svg>
+                    History
+                </button>
             </section>
         </main>
 
+        <dialog id="history-dialog" aria-labelledby="history-title" onclose="History.cancel()">
+            <header class="history-header">
+                <p class="eyebrow">Station history</p>
+                <h2 id="history-title"></h2>
+                <button class="close" onclick="History.close()" aria-label="Close history">×</button>
+                <div class="history-periods" aria-label="History period">
+                    <button data-period="day" aria-pressed="true" onclick="History.load('day')">Day</button>
+                    <button data-period="week" aria-pressed="false" onclick="History.load('week')">Week</button>
+                    <button data-period="month" aria-pressed="false" onclick="History.load('month')">Month</button>
+                    <button data-period="year" aria-pressed="false" onclick="History.load('year')">Year</button>
+                </div>
+                <p id="history-description" class="date" role="status"></p>
+            </header>
+            <div id="history-charts" class="history-charts"></div>
+            <p class="history-note">Times are local. Charts show available observations; gaps mean no readings. Rain is the reported rolling 24-hour amount, not a period total.</p>
+        </dialog>
         <script>
             let unitsMetric = true;
             let selectedWeatherKey = "temp";
@@ -127,6 +147,7 @@ License: MIT
                 refreshMarkersData();
                 updateLegend();
                 if (selectedStationData) renderStation(selectedStationData);
+                History.render();
             }
 
             function typeChange(button, type) {
@@ -149,7 +170,7 @@ License: MIT
                 };
                 const scale = scales[selectedWeatherKey];
                 const unit = selectedWeatherKey === "humidity" ? "%" : Convert.units(selectedWeatherKey);
-                const labels = scale.limits.map(value => Convert.as(value, selectedWeatherKey));
+                const labels = scale.limits.map(value => formatMeasurement(Convert.as(value, selectedWeatherKey), selectedWeatherKey));
                 document.getElementById("legend").innerHTML = `
                     <strong>${scale.title} <span>${unit}</span></strong>
                     <div class="legend-scale">${Array.from({length: 6}, (_, i) =>
@@ -410,7 +431,7 @@ License: MIT
                 const wx = { ...data.weather.wx };
                 validateWeather(wx);
                 const ago = Math.max(0, Math.floor((Date.now() - data.weather.timestamp) / 1000));
-                const value = key => defined(wx[key]) ? Convert.as(wx[key], key) : "—";
+                const value = key => defined(wx[key]) ? formatMeasurement(Convert.as(wx[key], key), key) : "—";
                 document.getElementById("station-details").innerHTML = `
                     <p class="date">Observed ${secondsToText(ago, true).trim()} ago</p>
                     <div class="station-temperature">${value("temp")}<span>${Convert.units("temp")}</span></div>
@@ -424,7 +445,7 @@ License: MIT
             }
 
             document.addEventListener("keydown", event => {
-                if (event.key === "Escape") closeStation();
+                if (event.key === "Escape" && !document.getElementById("history-dialog").open) closeStation();
             });
 
             //--------------------------------------------------------------------------------------------------------------
@@ -506,6 +527,14 @@ License: MIT
                         }
                     }
                 }
+            }
+
+            function formatMeasurement(value, key) {
+                // Keep light rain visible; other measurements use whole numbers.
+                const decimals = key === "rain_24h" ? (unitsMetric ? 1 : 2) : 0;
+                const factor = 10 ** decimals;
+                const rounded = Math.round(value * factor) / factor;
+                return (rounded === 0 ? 0 : rounded).toLocaleString();
             }
 
             function defined(x) {
@@ -654,5 +683,6 @@ License: MIT
 
             updateLegend();
         </script>
+        <script src="history.js"></script>
     </body>
 </html>

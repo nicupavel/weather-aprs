@@ -5,10 +5,20 @@ Router.get("/stations", getAllStations);
 Router.get("/stations/data", getAllStationsAndTodayData);
 Router.get("/stations/data/tight/:keys?", getAllStationsAndTodayTightData);
 Router.get("/station/:name", getStationByName);
+Router.get("/station/:name/history", getStationHistory);
 Router.get("/nearby/:lat/:lon/:dist", getNearbyStations);
 
 async function getStationByName(req, res) {
     return httpJSONResponse(res, await DB.getStationByName(req.params.name));
+}
+
+async function getStationHistory(req, res) {
+    try {
+        return httpJSONResponse(res, await DB.getStationHistory(req.params.name, req.query.period || "day"));
+    } catch (error) {
+        console.error("Could not load station history", error);
+        return res.status(500).json({ error: "Could not load station history." });
+    }
 }
 
 async function getNearbyStations(req, res) {

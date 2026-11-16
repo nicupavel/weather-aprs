@@ -24,6 +24,7 @@ module.exports = (function() {
             let result = await stations.createIndex({ "location": "2dsphere" });
             result = await stations.createIndex({ stationName: "text" });
             result = await stationData.createIndex({ stationName: "text" });
+            result = await stationData.createIndex({ stationName: 1, day: -1 });
             result = await stationData.createIndex({ day: 1 }, { expireAfterSeconds: 31622400 }); // Expire after 1 year
 
         } finally {
@@ -49,6 +50,49 @@ module.exports = (function() {
             }
         }
         return {};
+    }
+
+    async function getStationHistory(stationName, period) {
+        const hour = 60 * 60 * 1000;
+        const periods = {
+            day: { duration: 24 * hour, bucket: hour / 4, interval: "15-minute" },
+            week: { duration: 7 * 24 * hour, bucket: hour, interval: "Hourly" },
+            month: { duration: 30 * 24 * hour, bucket: 6 * hour, interval: "6-hour" },
+            year: { duration: 365 * 24 * hour, bucket: 24 * hour, interval: "Daily" },
+        };
+        if (!Object.keys(periods).includes(period)) return { statusCode: 400, error: "Choose day, week, month or year." };
+        const range = periods[period];
+
+        const to = Date.now();
+        const from = to - range.duration;
+        const firstDay = new Date(new Date(from).setUTCHours(0, 0, 0, 0));
+        const fields = ["temp", "wind_speed", "wind_gust", "rain_24h", "humidity", "pressure"];
+        const values = {};
+        for (const key of fields) {
+            values[key] = { $convert: { input: `$samples.wx.${key}`, to: "double", onError: null, onNull: null } };
+        }
+
+        const points = await stationData.aggregate([
+            { $match: { stationName, day: { $gte: firstDay, $lte: new Date(to) } } },
+            { $project: { samples: 1 } },
+            { $unwind: "$samples" },
+            { $match: { "samples.timestamp": { $gte: from, $lte: to } } },
+            { $project: { timestamp: "$samples.timestamp", ...values } },
+            { $group: {
+                _id: { $multiply: [{ $floor: { $divide: ["$timestamp", range.bucket] } }, range.bucket] },
+                count: { $sum: 1 },
+                temp: { $avg: "$temp" },
+                wind_speed: { $avg: "$wind_speed" },
+                wind_gust: { $max: "$wind_gust" },
+                rain_24h: { $max: "$rain_24h" },
+                humidity: { $avg: "$humidity" },
+                pressure: { $avg: "$pressure" },
+            } },
+            { $sort: { _id: 1 } },
+            { $project: { _id: 0, timestamp: "$_id", count: 1, temp: 1, wind_speed: 1, wind_gust: 1, rain_24h: 1, humidity: 1, pressure: 1 } },
+        ]).toArray();
+
+        return { stationName, period, from, to, bucket: range.bucket, interval: range.interval, points };
     }
 
     async function getAllStations() {
@@ -271,6 +315,7 @@ module.exports = (function() {
     return {
         connect: connect,
         getStationByName: getStationByName,
+        getStationHistory: getStationHistory,
         setStationData: setStationData,
         updateStations: updateStations,
         getNearbyStations: getNearbyStations,
