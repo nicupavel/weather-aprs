@@ -31,25 +31,32 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .legend-scale span { flex: 1; }
 .legend-labels { display: flex; justify-content: space-between; margin: 5px 12% 0; font-size: 11px; color: var(--muted); }
 .legend small { display: block; margin-top: 10px; font-size: 10px; color: var(--muted); line-height: 1.5; }
-.weather-marker { border: 2px solid white; border-radius: 50%; font-size: 13px; font-weight: 700; text-align: center; line-height: 32px; box-shadow: 0 2px 5px #20314250; font-variant-numeric: tabular-nums; }
+.weather-marker { border: 2px solid white; border-radius: 50%; font-size: 14px; font-weight: 700; text-align: center; line-height: 32px; box-shadow: 0 2px 5px #20314250; font-variant-numeric: tabular-nums; }
 .weather-marker.selected { outline: 3px solid #203142; outline-offset: 3px; }
-.weather-marker [badge] { position: relative; padding-right: 4px; }
-.weather-marker [badge]::after {
-    content: attr(badge);
+.weather-marker > div {
+    position: relative;
+}
+
+.cluster-badge {
     position: absolute;
     top: 0;
     right: 0;
-    transform: translate(60%, -60%);
+    transform: translate(40%, -40%);
     display: grid;
     place-items: center;
     width: 18px;
     height: 18px;
+    padding: 0;
     border: 2px solid white;
     border-radius: 50%;
     background: #203142;
-    color: #fff;
+    color: white;
     font-size: 18px;
     line-height: 1;
+}
+
+.cluster-badge > span {
+    transform: translate(0px, -2px);
 }
 .temp_0 { background: #7462b4; color: white; }
 .temp_1 { background: #91c5ed; color: #173b58; }

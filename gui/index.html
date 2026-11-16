@@ -244,7 +244,9 @@ License: MIT
                 return L.divIcon({
                     iconSize: [36, 36],
                     className: "weather-marker " + ColorCodes[selectedWeatherKey](val),
-                    html: isCluster ? `<div id=${id} badge="+">${val}</div>` : `<div id=${id}>${val}</div>`,
+                    html: isCluster
+                        ? `<div id="${id}">${val}<span class="cluster-badge"><span>+</span></span></div>`
+                        : `<div id="${id}">${val}</div>`,
                 });
             }
 
