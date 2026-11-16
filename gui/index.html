@@ -34,482 +34,37 @@ License: MIT
             crossorigin=""
         ></script>
         <script src=" https://unpkg.com/@joergdietrich/leaflet.terminator@1.0.0/L.Terminator.js"></script>
-        <style>
-            html * {
-                font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
-            }
-
-            .fullpage-overlay {
-                opacity: 0.8;
-                background: #fff;
-                width: 100%;
-                height: 100%;
-                z-index: 200;
-                top: 0;
-                left: 0;
-                position: fixed;
-                text-align: center;
-            }
-
-            .fullpage-overlay > svg {
-                position: absolute;
-                top: calc(50% - 66px);
-                left: calc(50% - 61px);
-            }
-
-            .weather-marker {
-                color: black;
-                border: 2px solid white;
-                border-radius: 50%;
-                width: 30px;
-                height: 30px;
-                font-weight: bold;
-                font-size: 15px;
-                text-align: center;
-                line-height: 30px;
-                box-shadow: 0 0 1px 4px rgba(70, 70, 70, 0.8);
-                bottom: 10px;
-            }
-
-            [badge]:after {
-                background-color: lightseagreen;
-                border-radius: 50%;
-                height: 10px;
-                color: #fff;
-                content: attr(badge);
-                font-size: 14px;
-                font-weight: bold;
-                margin-top: -8px;
-                min-width: 10px;
-                padding: 2px;
-                line-height: 10px;
-                position: absolute;
-                text-align: center;
-            }
-
-            [badge^="-"]:after,
-            [badge="0"]:after,
-            [badge=""]:after {
-                display: none;
-            }
-
-            .temp_0 {
-                background-color: darkviolet;
-                color: white;
-            }
-
-            .temp_1 {
-                background-color: slateblue;
-                color: white;
-            }
-
-            .temp_2 {
-                background-color: greenyellow;
-            }
-
-            .temp_3 {
-                background-color: orange;
-            }
-
-            .temp_4 {
-                background-color: orangered;
-            }
-
-            .temp_5 {
-                background-color: firebrick;
-                color: white;
-            }
-
-            .wind_0 {
-                background-color: deepskyblue;
-                color: black;
-            }
-
-            .wind_1 {
-                background-color: forestgreen;
-                color: white;
-            }
-
-            .wind_2 {
-                background-color: darkorange;
-                color: white;
-            }
-
-            .wind_3 {
-                background-color: violet;
-                color: white;
-            }
-
-            .wind_4 {
-                background-color: red;
-                color: white;
-            }
-
-            .wind_5 {
-                background-color: darkred;
-                color: white;
-            }
-
-            .rain_0 {
-                background-color: lightyellow;
-                color: black;
-            }
-
-            .rain_1 {
-                background-color: aqua;
-                color: black;
-            }
-
-            .rain_2 {
-                background-color: lightskyblue;
-                color: black;
-            }
-
-            .rain_3 {
-                background-color: deepskyblue;
-                color: white;
-            }
-
-            .rain_4 {
-                background-color: royalblue;
-                color: white;
-            }
-
-            .rain_5 {
-                background-color: navy;
-                color: white;
-            }
-
-            .humidity_0 {
-                background-color: lavender;
-                color: black;
-            }
-
-            .humidity_1 {
-                background-color: thistle;
-                color: black;
-            }
-
-            .humidity_2 {
-                background-color: lightpink;
-                color: black;
-            }
-
-            .humidity_3 {
-                background-color: violet;
-                color: white;
-            }
-
-            .humidity_4 {
-                background-color: hotpink;
-                color: white;
-            }
-
-            .humidity_5 {
-                background-color: deeppink;
-                color: white;
-            }
-
-            .leaflet-popup-content-wrapper {
-                width: 400px !important;
-            }
-
-            .leaflet-container a.leaflet-popup-close-button {
-                padding: 14px 14px 0 0 !important;
-                font: 24px/15px Tahoma, Verdana, sans-serif !important;
-                font-weight: 300 !important;
-            }
-
-            .stationName {
-                font-size: 1.735rem;
-                font-weight: 700;
-                text-transform: uppercase;
-                margin: 0 !important;
-            }
-
-            .date {
-                font-weight: 400;
-                font-size: 0.75rem;
-                color: rgb(132, 142, 154);
-                margin: 0 !important;
-            }
-
-            .tempwind {
-                display: table;
-                width: 366px;
-                margin-top: 1em;
-            }
-
-            .temp,
-            .wind,
-            .rain,
-            .humidity,
-            .pressure {
-                display: table-cell;
-                vertical-align: top;
-                width: 33%;
-            }
-
-            .tempvalue,
-            .weathervalue {
-                font-size: 4em;
-                font-weight: 700;
-                margin: 0 !important;
-            }
-
-            .weathervalue {
-                font-size: 1.5em;
-                font-weight: 500;
-            }
-
-            .temp {
-                width: 60%;
-            }
-
-            .wind {
-                width: 40%;
-            }
-
-            .subtitle {
-                font-size: 0.735rem;
-                font-weight: 300;
-                text-transform: uppercase;
-                color: #555;
-            }
-
-            .iconrain,
-            .iconhumidity,
-            .iconpressure,
-            .icontemp
-            .iconwind {
-                width: 32px;
-                margin-top: 0px;
-                margin-right: 5px;
-            }
-
-            .iconsmall {
-                width: 23px;
-                margin-top: 3px;
-                fill: #3399ff;
-            }
-            
-            .iconrain {
-                stroke-width: 10;
-                stroke: #3399ff;
-            }
-
-            .icontemp {
-                padding-left: 7px;
-                padding-right: 7px;
-            }
-
-            sup {
-                font-size: 0.55em;
-                margin-left: -0.1em;
-                color: #555;
-            }
-
-            nav {
-                position: absolute;
-                top: 18px;
-                right: 10px;
-                display: flex;
-                flex-wrap: wrap-reverse;
-                justify-content: center;
-                column-gap: 7px;
-            }
-
-            .container__buttons {
-                display: flex;
-                column-gap: 3px;
-                height: 30px;
-                z-index: 100;
-                font-weight: bold;
-                font-size: 15px;
-                background-color: white;
-                border: 2px solid #000;
-                border-radius: 4px;
-                padding: 5px;
-                cursor: pointer;
-            }
-
-            .unit {
-                text-align: center;
-                line-height: 30px;
-                flex: 1;
-                border: none;
-                font-size: 1.2em;
-            }
-
-            .unit[data-selected="0"] {
-                background-color: #f4f4f4;
-                color: #bbb;
-            }
-
-            .unit[data-selected="1"] {
-                background-color: white;
-                color: black;
-            }
-
-            .unit[data-type-selected="0"] {
-                background-color: #f4f4f4;
-            }
-
-            .unit[data-type-selected="0"] > abbr > svg {
-                fill: #bbb;
-            }
-
-            .unit[data-type-selected="1"] > abbr > svg {
-                fill: #3399ff;
-            }
-
-            .unit[data-type-selected="1"] {
-                background-color: white;
-            }
-
-            @media only screen and (max-width: 600px) {
-                nav {
-                    top: auto;
-                    bottom: 20px;
-                }
-
-                .leaflet-popup-content-wrapper {
-                    transform: scale(0.8);
-                }
-
-                .leaflet-container a.leaflet-popup-close-button {
-                    padding: 32px 48px 0 0 !important;
-                }
-
-                .leaflet-popup,
-                .leaflet-zoom-animated {
-                    bottom: -46px !important;
-                }
-
-                .leaflet-popup-tip-container {
-                    margin-top: -24px;
-                }
-            }
-        </style>
+        <link rel="stylesheet" href="style.css">
     </head>
-    <body>        
-        <nav>
-            <div class="container__buttons">
-                <button class="unit" onClick="locationChange()" aria-label="Set map to your current location">
-                    <abbr title="Set map to your current location">
-                        <svg class="iconsmall" viewBox="0 0 256 256" id="Flat" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M127.99414,15.9971a88.1046,88.1046,0,0,0-88,88c0,75.29688,80,132.17188,83.40625,134.55469a8.023,8.023,0,0,0,9.1875,0c3.40625-2.38281,83.40625-59.25781,83.40625-134.55469A88.10459,88.10459,0,0,0,127.99414,15.9971ZM128,72a32,32,0,1,1-32,32A31.99909,31.99909,0,0,1,128,72Z"/>
-                        </svg>
-                    </abbr>
-                </button>
+    <body>
+        <!-- <header class="brand"><strong>MeteoGlance</strong><span>Weather observed around the world</span></header> -->
+        <nav aria-label="Map controls">
+            <div class="map-tools panel">
+                <button id="locate-button" onclick="locationChange()" aria-label="Locate me" title="Locate me"><svg class="control-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg></button>
+                <div class="units" aria-label="Temperature units">
+                    <button data-selected="1" aria-pressed="true" onclick="unitsChange(true)">°C</button>
+                    <button data-selected="0" aria-pressed="false" onclick="unitsChange(false)">°F</button>
+                </div>
             </div>
-            <div class="container__buttons" onclick="unitsChange()">
-                <button class="unit" data-selected="1">°C</button>
-                <button class="unit" data-selected="0">°F</button>
-            </div>
-            <div class="container__buttons">
-                <button class="unit" data-type-selected="0" onclick="typeChange(this, 'rain_24h')" aria-label="View Rain Data">
-                    <abbr title="Rain in last 24h in mm or inches">
-                        <svg class="iconrain iconsmall" viewBox="0 0 511.8 511.8">
-                            <path
-                                d="m218.3 133.03c-7.04-9.11-13.171-16.409-18.224-21.694-7.182-7.512-13.125-12.168-20.55-12.168s-13.368 4.656-20.55 12.167c-5.053 5.285-11.185 12.584-18.224 21.695-14.86 19.23-31.528 43.594-46.934 68.601-24.292 39.432-65.043 112.58-65.043 159.43 0 83.124 67.626 150.75 150.75 150.75s150.75-67.626 150.75-150.75c0-46.85-40.751-120-65.043-159.43-15.405-25.007-32.073-49.37-46.932-68.601zm-38.774 348.78c-66.582 0-120.75-54.168-120.75-120.75 0-27.47 20.462-77.186 56.14-136.4 26.795-44.469 52.544-78.315 64.61-91.438 12.065 13.122 37.815 46.968 64.61 91.438 35.678 59.212 56.14 108.93 56.14 136.4 0 66.582-54.169 120.75-120.75 120.75z"
-                            />
-                            <path
-                                d="m447.43 57.784c-8.311-13.491-17.317-26.653-25.359-37.061-12.422-16.075-18.291-20.723-26.165-20.723s-13.743 4.648-26.164 20.723c-8.042 10.408-17.048 23.569-25.359 37.061-16.242 26.365-35.603 63.103-35.603 88.395 0 48.042 39.085 87.126 87.126 87.126 48.042 0 87.127-39.085 87.127-87.126 0-25.293-19.361-62.03-35.603-88.395zm-51.524 145.52c-31.5 0-57.126-25.627-57.126-57.126 0-12.89 10.432-38.055 27.906-67.319 11.112-18.61 22.066-33.947 29.221-42.897 7.155 8.951 18.109 24.288 29.221 42.897 17.474 29.264 27.906 54.429 27.906 67.319-1e-3 31.499-25.628 57.126-57.128 57.126z"
-                            />
-                        </svg>
-                    </abbr>
-                </button>
-                <button class="unit" data-type-selected="1" onclick="typeChange(this, 'temp')" aria-label="View Temperature Data">
-                    <abbr title="Current temperature in °C or °F">
-                        <svg
-                            class="icontemp iconsmall"
-                            style="margin-left: 0px"
-                            viewBox="0 0 250 250"
-                        >
-                            <path
-                                d="M159.845 147.251V34.744C159.845 15.586 144.255 0 125.093 0c-19.159 0-34.746 15.586-34.746 34.744V147.25c-14.234 10.843-22.617 27.59-22.617 45.575 0 31.631 25.732 57.364 57.363 57.364 31.633 0 57.367-25.733 57.367-57.364 0-17.983-8.383-34.73-22.615-45.574zm-34.752 87.938c-23.359 0-42.363-19.004-42.363-42.364 0-14.294 7.188-27.537 19.228-35.425a7.502 7.502 0 0 0 3.39-6.273V34.744c0-10.887 8.858-19.744 19.746-19.744 10.892 0 19.752 8.857 19.752 19.744v116.383a7.498 7.498 0 0 0 3.39 6.273c12.038 7.889 19.226 21.132 19.226 35.425-.002 23.36-19.008 42.364-42.369 42.364z"
-                            />
-                            <path
-                                d="M132.595 169.042V69.924c0-4.142-3.357-7.5-7.5-7.5s-7.5 3.358-7.5 7.5v99.118c-10.104 3.183-17.43 12.622-17.43 23.783 0 13.767 11.16 24.931 24.93 24.931 13.773 0 24.932-11.164 24.932-24.931-.001-11.162-7.327-20.602-17.432-23.783z"
-                            />
-                        </svg>
-                    </abbr>
-                </button>
-                <button class="unit" data-type-selected="0" onclick="typeChange(this, 'humidity')" aria-label="View Relative Humidity Data">
-                    <abbr title="Current humidity as percent">
-                        <svg class="iconhumidity iconsmall" viewBox="0 0 512 512">
-                            <path
-                                d="m331.76 429c7.7266 7.8867 7.6016 20.551-0.28906 28.281-36.008 35.281-84.473 54.715-136.47 54.715-52.117 0-101.07-20.086-137.83-56.559-36.867-36.578-57.172-85.387-57.172-137.44v-5.3594c0-67.566 56.461-132.36 106.27-189.52 33.789-38.773 68.727-78.871 68.727-103.12 0-11.047 8.9531-20 20-20s20 8.9531 20 20c0 25.836 35.438 66.145 69.703 105.13 6.2344 7.0898 12.68 14.422 19.051 21.809 7.2148 8.3633 6.2812 20.992-2.0781 28.207-8.3633 7.2148-20.992 6.2852-28.211-2.082-6.2461-7.2422-12.629-14.504-18.801-21.523-23.48-26.711-45.199-51.418-60.012-75.047-14.574 22.816-35.57 46.906-58.223 72.902-45.199 51.871-96.43 110.66-96.43 163.25v5.3594c0 84.914 69.531 154 155 154 41.469 0 79.992-15.371 108.48-43.285 7.8906-7.7305 20.551-7.6016 28.285 0.28906zm160.24-74.004c-7.7109 0-18.176-7.2344-28.711-19.848-8.5742-10.266-21.438-16.152-35.289-16.152s-26.715 5.8867-35.289 16.152c-10.535 12.613-21 19.848-28.711 19.848s-18.176-7.2344-28.711-19.848c-8.5742-10.266-21.438-16.152-35.289-16.152s-26.715 5.8867-35.289 16.152c-10.535 12.613-21 19.848-28.711 19.848s-18.176-7.2344-28.711-19.848c-8.5742-10.266-21.438-16.152-35.289-16.152s-26.715 5.8867-35.289 16.152c-10.535 12.613-21 19.848-28.711 19.848-11.047 0-20 8.9531-20 20s8.9531 20 20 20c20.465 0 40.453-11.508 59.41-34.207 0.94141-1.1211 2.6562-1.793 4.5898-1.793s3.6484 0.67188 4.5898 1.7969c18.957 22.695 38.945 34.203 59.41 34.203s40.453-11.508 59.41-34.207c0.94141-1.1211 2.6562-1.793 4.5898-1.793s3.6484 0.67188 4.5898 1.7969c18.957 22.695 38.945 34.203 59.41 34.203s40.453-11.508 59.41-34.207c0.94141-1.1211 2.6562-1.793 4.5898-1.793s3.6484 0.67188 4.5898 1.7969c18.957 22.695 38.945 34.203 59.41 34.203 11.047 0 20-8.9531 20-20s-8.9531-20-20-20zm-227.29-119.85c-10.535 12.613-21 19.848-28.711 19.848-11.047 0-20 8.9531-20 20s8.9531 20 20 20c20.465 0 40.453-11.508 59.41-34.207 0.94141-1.1211 2.6562-1.793 4.5898-1.793s3.6484 0.67188 4.5898 1.7969c18.957 22.695 38.945 34.203 59.41 34.203s40.453-11.508 59.41-34.207c0.94141-1.1211 2.6562-1.793 4.5898-1.793s3.6484 0.67188 4.5898 1.7969c18.957 22.695 38.945 34.203 59.41 34.203 11.047 0 20-8.9531 20-20s-8.9531-20-20-20c-7.7109 0-18.176-7.2344-28.711-19.848-8.5742-10.266-21.438-16.152-35.289-16.152s-26.715 5.8867-35.289 16.152c-10.535 12.613-21 19.848-28.711 19.848s-18.176-7.2344-28.711-19.848c-8.5742-10.266-21.438-16.152-35.289-16.152s-26.715 5.8867-35.289 16.152z"
-                            />
-                        </svg>
-                    </abbr>
-                </button>
-                <button class="unit" data-type-selected="0" onclick="typeChange(this, 'wind_speed')" aria-label="View Wind Speed Data">
-                    <abbr title="Current wind speed as km/h or mph">
-                        <svg class="iconhumidity iconsmall" viewBox="0 0 24 24">
-                            <path
-                                fill-rule="evenodd"
-                                d="M7 5a4 4 0 1 1 4 4H3a1 1 0 0 1 0-2h8a2 2 0 1 0-2-2v.1a1 1 0 0 1-2 0V5Zm9.9 1a1 1 0 0 1 1-1h.1a4 4 0 0 1 0 8H5a1 1 0 1 1 0-2h13a2 2 0 1 0 0-4h-.1a1 1 0 0 1-1-1ZM0 12a1 1 0 0 1 1-1h1a1 1 0 1 1 0 2H1a1 1 0 0 1-1-1Zm4 4a1 1 0 0 1 1-1h1a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1Zm4 0a1 1 0 0 1 1-1h4a4 4 0 1 1-4 4v-.1a1 1 0 1 1 2 0v.1a2 2 0 1 0 2-2H9a1 1 0 0 1-1-1Z"
-                                clip-rule="evenodd"
-                            />
-                        </svg>
-                    </abbr>
-                </button>
+            <div class="weather-types panel" aria-label="Weather measurement">
+                <button data-type-selected="1" aria-pressed="true" onclick="typeChange(this, 'temp')" aria-label="Temperature" title="Temperature"><svg class="control-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14.5V5a3 3 0 0 1 6 0v9.5a5 5 0 1 1-6 0Z"/><path d="M12 8v10"/><circle cx="12" cy="18" r="1.5" fill="currentColor" stroke="none"/></svg></button>
+                <button data-type-selected="0" aria-pressed="false" onclick="typeChange(this, 'rain_24h')" aria-label="Rain in the last 24 hours" title="Rain in the last 24 hours"><svg class="control-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 15H6a4 4 0 0 1-.5-8A6 6 0 0 1 17 6a4.5 4.5 0 0 1 1 9h-1M8 18l-1 3m6-3-1 3m6-3-1 3"/></svg></button>
+                <button data-type-selected="0" aria-pressed="false" onclick="typeChange(this, 'humidity')" aria-label="Humidity" title="Humidity"><svg class="control-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2S5 10 5 14a7 7 0 0 0 14 0c0-4-7-12-7-12Z"/><path d="m9.5 16 5-5"/><circle cx="9.5" cy="11" r=".7"/><circle cx="14.5" cy="16" r=".7"/></svg></button>
+                <button data-type-selected="0" aria-pressed="false" onclick="typeChange(this, 'wind_speed')" aria-label="Wind speed" title="Wind speed"><svg class="control-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h11a3 3 0 1 0-3-3M2 12h17a3 3 0 1 0-3-3M4 16h9a3 3 0 1 1-3 3"/></svg></button>
             </div>
         </nav>
         <main>
-            <div id="loading" class="fullpage-overlay">   
-                <svg width="169.33" height="97" viewBox="0 0 169 96">
-                    <g>
-                        <g>
-                            <g>
-                                <path
-                                    d="M89.91,5.85,90.55,0C100.6,4.68,107.76,11.73,111,22.53l4.64-2.06c1.3,11.05-1.28,20.73-8.68,29.15l4.79,3c-8.67,7-18.24,10.23-29.44,8.56,0,1-.11,1.71-.13,2.45s0,1.36,0,2.56c-11.05-4.49-18.68-11.65-22.29-23l-5.68,2.66c-1.28-11.72,1.55-21.79,10-30.37l-5.08-4C68.61,5.14,78.57,2.7,89.91,5.85ZM83.33,19.79c6.14-4.23,12.24-3.77,18.77-2.1C90.21,10.37,71.15,20.5,72.22,35.44,67.83,29,68,22.48,70,15.77c-2.49,4.82-3.55,9.92-1.76,15.12,3.09,9,9.08,14.7,19.26,15.34a29.57,29.57,0,0,1-8,3.14c-2.8.48-5.74.1-8.69.1,5.65,1.92,11.26,1.84,16.41-1.06C94,44.6,98.44,39.07,98.38,30.57A30.46,30.46,0,0,1,101.64,39c.49,2.9.1,5.94.1,8.4C106.93,35.69,97.09,20,83.33,19.79Z"
-                                    style="fill: #b5a0cd"
-                                >
-                                    <animateTransform attributeType="xml"
-                                        attributeName="transform"
-                                        type="rotate"
-                                        from="0 84.5 32"
-                                        to="360 84.5 32"
-                                        dur="1.5s"
-                                        repeatCount="indefinite"/>
-                                </path>
-                                <g>
-                                    <path
-                                        d="M0,96.37V78.61H5.77L9.36,85.5l3.51-6.89h5.85V96.37H15.13V83.21h-.36l-3.72,7.72H7.67L4,83.21H3.59V96.37Z"
-                                        style="fill: #b5a0cd" />
-                                    <path d="M22,96.37V78.61H33.8v3H25.59v4.32h8.18v2.94H25.59v4.52H33.8v3Z" style="fill: #b5a0cd" />
-                                    <path d="M39.76,96.37V81.65H35v-3H48v3H43.35V96.37Z" style="fill: #b5a0cd" />
-                                    <path d="M49.92,96.37V78.61H61.73v3H53.51v4.32H61.7v2.94H53.51v4.52h8.22v3Z"
-                                        style="fill: #b5a0cd" />
-                                    <path
-                                        d="M71,96.66a8.67,8.67,0,0,1-4.48-1,5.6,5.6,0,0,1-2.37-3,15.32,15.32,0,0,1-.71-5.07,15.71,15.71,0,0,1,.71-5.13,5.75,5.75,0,0,1,2.37-3.09,8.37,8.37,0,0,1,4.48-1,8.41,8.41,0,0,1,4.49,1,5.68,5.68,0,0,1,2.36,3.09,15.68,15.68,0,0,1,.72,5.13,15.5,15.5,0,0,1-.72,5.12,5.4,5.4,0,0,1-2.36,3A8.82,8.82,0,0,1,71,96.66Zm0-3A4,4,0,0,0,73.5,93a3.35,3.35,0,0,0,1.13-2,17,17,0,0,0,.28-3.39,16.5,16.5,0,0,0-.3-3.42,3.66,3.66,0,0,0-7.21,0,18.94,18.94,0,0,0,0,6.77,3.47,3.47,0,0,0,1.14,2A3.84,3.84,0,0,0,71,93.64Z"
-                                        style="fill: #b5a0cd" />
-                                    <path
-                                        d="M88.17,96.63a10,10,0,0,1-3.69-.58,4.9,4.9,0,0,1-2.27-1.75,7.2,7.2,0,0,1-1.16-2.86,19.94,19.94,0,0,1-.34-3.94,19.5,19.5,0,0,1,.38-4.09,7.09,7.09,0,0,1,1.25-2.86,5.19,5.19,0,0,1,2.28-1.69,9.69,9.69,0,0,1,3.5-.56,21.84,21.84,0,0,1,2.23.12c.77.08,1.5.17,2.21.3s1.28.24,1.75.36l0,2.81c-.49-.09-1.07-.17-1.76-.24s-1.38-.12-2.09-.16-1.35-.07-1.92-.07a5.5,5.5,0,0,0-2.12.34,2.45,2.45,0,0,0-1.25,1.08,5.13,5.13,0,0,0-.59,1.9,21.81,21.81,0,0,0-.15,2.76,16.3,16.3,0,0,0,.3,3.42,3.28,3.28,0,0,0,1.17,2,4.15,4.15,0,0,0,2.51.65l.89,0c.32,0,.64,0,.94-.07s.56-.07.77-.11V89.51H88.85V86.78h5.51V96L93,96.15c-.53.08-1.09.15-1.67.22l-1.69.18A13.27,13.27,0,0,1,88.17,96.63Z"
-                                        style="fill: #b5a0cd" />
-                                    <path d="M97.33,96.37V78.61h3.58V93.33h7v3Z" style="fill: #b5a0cd" />
-                                    <path
-                                        d="M108.53,96.37l4.53-17.76h6.27l4.49,17.76h-3.58l-1-3.59H113l-.93,3.59Zm5.07-6.47h5.13l-2-8.38h-1.09Z"
-                                        style="fill: #b5a0cd" />
-                                    <path d="M125.77,96.37V78.61h4.68l5.7,12.48h.47V78.61h3.59V96.37h-4.63l-5.75-12.69h-.47V96.37Z"
-                                        style="fill: #b5a0cd" />
-                                    <path
-                                        d="M149.88,96.66a9.22,9.22,0,0,1-3.42-.54,4.53,4.53,0,0,1-2.12-1.65,7,7,0,0,1-1.08-2.84,28.65,28.65,0,0,1,0-8.27,7,7,0,0,1,1.08-2.85,4.61,4.61,0,0,1,2.15-1.66A9.35,9.35,0,0,1,150,78.3a16.28,16.28,0,0,1,1.8.1c.62.07,1.22.16,1.8.25s1.08.2,1.5.3L155,81.81c-.34-.07-.78-.13-1.3-.19s-1-.11-1.58-.15-1,0-1.51,0a5.52,5.52,0,0,0-2,.31,2.46,2.46,0,0,0-1.21,1,5.14,5.14,0,0,0-.58,1.89,25.2,25.2,0,0,0,0,5.67,5,5,0,0,0,.57,1.87,2.42,2.42,0,0,0,1.21,1,5.49,5.49,0,0,0,2.07.32c.69,0,1.46,0,2.3-.11l2.09-.22.08,2.83c-.42.09-.91.18-1.48.27s-1.18.18-1.82.24S150.5,96.66,149.88,96.66Z"
-                                        style="fill: #b5a0cd" />
-                                    <path d="M157.52,96.37V78.61h11.81v3h-8.22v4.32h8.19v2.94h-8.19v4.52h8.22v3Z"
-                                        style="fill: #b5a0cd" />
-                                </g>
-                            </g>
-                        </g>
-                    </g>
-                </svg>
-            </div>
-            <div id="mapid" style="width: 100%; height: 98vh; z-index: 0"></div>
+            <div id="mapid" aria-label="Weather station map"></div>
+            <div id="loading" class="status panel" role="status">Loading observations…</div>
+            <div id="location-status" class="status location-status panel" role="status" hidden></div>
+            <aside id="legend" class="legend panel" aria-label="Weather color scale"></aside>
+            <section id="station-panel" class="station-panel panel" aria-label="Station details" hidden>
+                <button class="close" onclick="closeStation()" aria-label="Close station details">×</button>
+                <h1 id="station-name"></h1>
+                <div id="station-details" aria-live="polite"></div>
+            </section>
         </main>
-        
+
         <script>
             let unitsMetric = true;
             let selectedWeatherKey = "temp";
@@ -525,37 +80,82 @@ License: MIT
             };
 
             function locationChange() {
-                Location.get((err, lat, lon) => {
-                    if (!err) {
-                        map.setView(L.latLng(lat, lon), 10);
-                    }                    
+                const button = document.getElementById("locate-button");
+                const status = document.getElementById("location-status");
+                status.hidden = false;
+
+                if (!navigator.geolocation) {
+                    status.textContent = "Location is unavailable. Use HTTPS or localhost.";
+                    return;
+                }
+
+                button.disabled = true;
+                button.setAttribute("aria-busy", "true");
+                status.textContent = "Finding your location…";
+
+                function finished() {
+                    button.disabled = false;
+                    button.removeAttribute("aria-busy");
+                }
+
+                navigator.geolocation.getCurrentPosition(position => {
+                    finished();
+                    status.hidden = true;
+                    map.setView([position.coords.latitude, position.coords.longitude], 10);
+                }, error => {
+                    finished();
+                    const messages = {
+                        1: "Location access was denied. Check browser and system location permissions.",
+                        2: "Your browser could not determine your location. Check system location services and try again.",
+                        3: "Your browser did not return a location within 20 seconds. Try again or check system location services.",
+                    };
+                    status.textContent = messages[error.code] || "Could not find your location. Try again.";
+                }, {
+                    enableHighAccuracy: false,
+                    timeout: 20000,
+                    maximumAge: 10 * 60 * 1000,
                 });
             }
 
-            function unitsChange() {
-                unitsMetric = !unitsMetric;
-                const elems = document.querySelectorAll("[data-selected]");
-                for (const e of elems) {
-                    if (e.dataset.selected === "1") {
-                        e.dataset.selected = "0";
-                    } else {
-                        e.dataset.selected = "1";
-                    }
-                }
+            function unitsChange(metric) {
+                unitsMetric = metric;
+                document.querySelectorAll("[data-selected]").forEach((button, index) => {
+                    const selected = index === (metric ? 0 : 1);
+                    button.dataset.selected = selected ? "1" : "0";
+                    button.setAttribute("aria-pressed", selected);
+                });
                 refreshMarkersData();
+                updateLegend();
+                if (selectedStationData) renderStation(selectedStationData);
             }
 
-            function typeChange(context, type) {
+            function typeChange(button, type) {
                 selectedWeatherKey = type;
-                const elems = document.querySelectorAll("[data-type-selected]");
-                for (const e of elems) {
-                    if (e.dataset.typeSelected === "1") {
-                        e.dataset.typeSelected = "0";
-                    }
-                }
-
-                context.dataset.typeSelected = "1";
+                document.querySelectorAll("[data-type-selected]").forEach(item => {
+                    const selected = item === button;
+                    item.dataset.typeSelected = selected ? "1" : "0";
+                    item.setAttribute("aria-pressed", selected);
+                });
                 refreshMarkersData();
+                updateLegend();
+            }
+
+            function updateLegend() {
+                const scales = {
+                    temp: { title: "Temperature", prefix: "temp", limits: [0, 10, 20, 30, 40] },
+                    rain_24h: { title: "Rain · last 24 hours", prefix: "rain", limits: [0, 2, 5, 10, 20] },
+                    humidity: { title: "Humidity", prefix: "humidity", limits: [15, 30, 45, 60, 75] },
+                    wind_speed: { title: "Wind speed", prefix: "wind", limits: [5, 10, 20, 40, 60] },
+                };
+                const scale = scales[selectedWeatherKey];
+                const unit = selectedWeatherKey === "humidity" ? "%" : Convert.units(selectedWeatherKey);
+                const labels = scale.limits.map(value => Convert.as(value, selectedWeatherKey));
+                document.getElementById("legend").innerHTML = `
+                    <strong>${scale.title} <span>${unit}</span></strong>
+                    <div class="legend-scale">${Array.from({length: 6}, (_, i) =>
+                        `<span class="${scale.prefix}_${i}"></span>`).join("")}</div>
+                    <div class="legend-labels">${labels.map(value => `<span>${value}</span>`).join("")}</div>
+                    <small>Cluster numbers show averages · + means multiple stations</small>`;
             }
 
             //--------------------------------------------------------------------------------------------------------------
@@ -569,7 +169,7 @@ License: MIT
 
             function createIcon(id, val, isCluster) {
                 return L.divIcon({
-                    iconSize: 30,
+                    iconSize: [36, 36],
                     className: "weather-marker " + ColorCodes[selectedWeatherKey](val),
                     html: isCluster ? `<div id=${id} badge="+">${val}</div>` : `<div id=${id}>${val}</div>`,
                 });
@@ -610,8 +210,11 @@ License: MIT
                 minZoom: 3,
                 maxBoundsViscosity: 1.0,
                 maxBounds: bounds,
+                zoomControl: false,
             }).setView(L.latLng(47, 27), 3);
             
+            L.control.zoom({ position: "bottomright" }).addTo(map);
+
             map.attributionControl.setPrefix('© <a href="https://github.com/nicupavel/weather-aprs">Nicu Pavel MeteoGlance</a>');
 
             // add the OpenStreetMap tiles
@@ -670,7 +273,7 @@ License: MIT
                 if (!markerElem) {
                     return;
                 }
-                markerElem.parentElement.className = "weather-marker " + ColorCodes[selectedWeatherKey](val);
+                markerElem.parentElement.className = "weather-marker " + ColorCodes[selectedWeatherKey](val) + (markerId === selectedStation ? " selected" : "");
                 markerElem.textContent = val;
             }
 
@@ -697,15 +300,24 @@ License: MIT
             const apiHost = `${server}${port?`:${port}`:''}`;
 
             function apiGetWeatherData() {
+                const status = document.getElementById("loading");
+                status.textContent = "Updating observations…";
+                status.style.display = "block";
                 let req = new XMLHttpRequest();
                 req.open("GET", `${apiHost}/api/v0/stations/data/tight/wind_speed,temp,rain_24h,humidity`);
                 req.onreadystatechange = function () {
-                    if (this.readyState == 4 && this.status == 200) {
+                    if (this.readyState !== 4) return;
+                    if (this.status !== 200) {
+                        status.textContent = "Could not update observations. Retrying in 5 minutes.";
+                        return;
+                    }
+                    if (this.status == 200) {
                         try {
                             weatherData = JSON.parse(this.responseText);
                             updateStations(weatherData);
                             document.getElementById("loading").style.display = "none";
                         } catch (err) {
+                            status.textContent = "Could not read observations. Retrying in 5 minutes.";
                             console.error("Error parsing API data");
                             console.error(err);
                         }
@@ -753,77 +365,67 @@ License: MIT
                 }
             }
 
-            function markerPopup(a) {
-                let stationName = a.layer.options.data.title;
-                let req = new XMLHttpRequest();
-                req.open("GET", `${apiHost}/api/v0/station/${stationName}`);
-                req.send();
+            let selectedStation = null;
+            let selectedStationData = null;
 
-                req.onreadystatechange = function () {
-                    if (this.readyState == 4 && this.status == 200) {
-                        try {
-                            const data = JSON.parse(this.responseText);
-                            const wdate = new Date(data.weather.timestamp).toString();
-                            const ago = ((Date.now() - data.weather.timestamp) / 1000) >> 0;
-                            const wx = data.weather.wx;
-                            validateWeather(wx);
+            function closeStation() {
+                selectedStation = null;
+                selectedStationData = null;
+                document.getElementById("station-panel").hidden = true;
+                document.querySelector(".weather-marker.selected")?.classList.remove("selected");
+            }
 
-                            let html = `<p class='stationName'>${stationName}</p>
-                            <p class='date'>${secondsToText(ago)} ago</p>
-                            <div class='tempwind'>
-                                <div class='temp'>
-                                    <span class='subtitle'>Temperature<br></span>
-                                    <p class='tempvalue'>
-                                        ${Convert.as(wx.temp, "temp") || "--"}<sup>${Convert.units("temp")}</sup>
-                                    </p>
-                                </div>
-                                <div class='wind'>
-                                    <span class='subtitle'>Wind<br></span>
-                                    <br>Gust: 
-                                    <strong>${Convert.as(wx.wind_gust, "wind_gust") || "--"}</strong>
-                                    <sup>${Convert.units("wind_gust")}</sup>
-                                    <br>Direction: 
-                                    <strong>${degreesToCardinal(wx.wind_direction) || "--"}</strong>
-                                    <br>Speed:
-                                    <strong>${Convert.as(wx.wind_speed, "wind_speed")}</strong> 
-                                    <sup>${Convert.units("wind_speed")}</sup>
-                                </div>
-                            </div>
-                            <hr style='width: 366px;'>
-                            <div class='tempwind'><div class='rain'>
-                                <svg class='iconrain' viewBox='0 0 511.8 511.8' xmlns='http://www.w3.org/2000/svg'><path d='m218.3 133.03c-7.04-9.11-13.171-16.409-18.224-21.694-7.182-7.512-13.125-12.168-20.55-12.168s-13.368 4.656-20.55 12.167c-5.053 5.285-11.185 12.584-18.224 21.695-14.86 19.23-31.528 43.594-46.934 68.601-24.292 39.432-65.043 112.58-65.043 159.43 0 83.124 67.626 150.75 150.75 150.75s150.75-67.626 150.75-150.75c0-46.85-40.751-120-65.043-159.43-15.405-25.007-32.073-49.37-46.932-68.601zm-38.774 348.78c-66.582 0-120.75-54.168-120.75-120.75 0-27.47 20.462-77.186 56.14-136.4 26.795-44.469 52.544-78.315 64.61-91.438 12.065 13.122 37.815 46.968 64.61 91.438 35.678 59.212 56.14 108.93 56.14 136.4 0 66.582-54.169 120.75-120.75 120.75z' fill='#3399ff'/><path d='m447.43 57.784c-8.311-13.491-17.317-26.653-25.359-37.061-12.422-16.075-18.291-20.723-26.165-20.723s-13.743 4.648-26.164 20.723c-8.042 10.408-17.048 23.569-25.359 37.061-16.242 26.365-35.603 63.103-35.603 88.395 0 48.042 39.085 87.126 87.126 87.126 48.042 0 87.127-39.085 87.127-87.126 0-25.293-19.361-62.03-35.603-88.395zm-51.524 145.52c-31.5 0-57.126-25.627-57.126-57.126 0-12.89 10.432-38.055 27.906-67.319 11.112-18.61 22.066-33.947 29.221-42.897 7.155 8.951 18.109 24.288 29.221 42.897 17.474 29.264 27.906 54.429 27.906 67.319-1e-3 31.499-25.628 57.126-57.128 57.126z' fill='#3399ff'/></svg>                                <span class='subtitle'>Rain 24h<br></span>
-                                <p class='weathervalue'>
-                                    ${Convert.as(wx.rain_24h, "rain_24h") || "--"} <sup>${Convert.units(
-                                "rain_24h"
-                            )}</sub>
-                                </p>
-                            </div>
-                            <div class='humidity'>
-                                <svg class='iconhumidity' viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'><path d='m331.76 429c7.7266 7.8867 7.6016 20.551-0.28906 28.281-36.008 35.281-84.473 54.715-136.47 54.715-52.117 0-101.07-20.086-137.83-56.559-36.867-36.578-57.172-85.387-57.172-137.44v-5.3594c0-67.566 56.461-132.36 106.27-189.52 33.789-38.773 68.727-78.871 68.727-103.12 0-11.047 8.9531-20 20-20s20 8.9531 20 20c0 25.836 35.438 66.145 69.703 105.13 6.2344 7.0898 12.68 14.422 19.051 21.809 7.2148 8.3633 6.2812 20.992-2.0781 28.207-8.3633 7.2148-20.992 6.2852-28.211-2.082-6.2461-7.2422-12.629-14.504-18.801-21.523-23.48-26.711-45.199-51.418-60.012-75.047-14.574 22.816-35.57 46.906-58.223 72.902-45.199 51.871-96.43 110.66-96.43 163.25v5.3594c0 84.914 69.531 154 155 154 41.469 0 79.992-15.371 108.48-43.285 7.8906-7.7305 20.551-7.6016 28.285 0.28906zm160.24-74.004c-7.7109 0-18.176-7.2344-28.711-19.848-8.5742-10.266-21.438-16.152-35.289-16.152s-26.715 5.8867-35.289 16.152c-10.535 12.613-21 19.848-28.711 19.848s-18.176-7.2344-28.711-19.848c-8.5742-10.266-21.438-16.152-35.289-16.152s-26.715 5.8867-35.289 16.152c-10.535 12.613-21 19.848-28.711 19.848s-18.176-7.2344-28.711-19.848c-8.5742-10.266-21.438-16.152-35.289-16.152s-26.715 5.8867-35.289 16.152c-10.535 12.613-21 19.848-28.711 19.848-11.047 0-20 8.9531-20 20s8.9531 20 20 20c20.465 0 40.453-11.508 59.41-34.207 0.94141-1.1211 2.6562-1.793 4.5898-1.793s3.6484 0.67188 4.5898 1.7969c18.957 22.695 38.945 34.203 59.41 34.203s40.453-11.508 59.41-34.207c0.94141-1.1211 2.6562-1.793 4.5898-1.793s3.6484 0.67188 4.5898 1.7969c18.957 22.695 38.945 34.203 59.41 34.203s40.453-11.508 59.41-34.207c0.94141-1.1211 2.6562-1.793 4.5898-1.793s3.6484 0.67188 4.5898 1.7969c18.957 22.695 38.945 34.203 59.41 34.203 11.047 0 20-8.9531 20-20s-8.9531-20-20-20zm-227.29-119.85c-10.535 12.613-21 19.848-28.711 19.848-11.047 0-20 8.9531-20 20s8.9531 20 20 20c20.465 0 40.453-11.508 59.41-34.207 0.94141-1.1211 2.6562-1.793 4.5898-1.793s3.6484 0.67188 4.5898 1.7969c18.957 22.695 38.945 34.203 59.41 34.203s40.453-11.508 59.41-34.207c0.94141-1.1211 2.6562-1.793 4.5898-1.793s3.6484 0.67188 4.5898 1.7969c18.957 22.695 38.945 34.203 59.41 34.203 11.047 0 20-8.9531 20-20s-8.9531-20-20-20c-7.7109 0-18.176-7.2344-28.711-19.848-8.5742-10.266-21.438-16.152-35.289-16.152s-26.715 5.8867-35.289 16.152c-10.535 12.613-21 19.848-28.711 19.848s-18.176-7.2344-28.711-19.848c-8.5742-10.266-21.438-16.152-35.289-16.152s-26.715 5.8867-35.289 16.152z' fill='#3399ff'/></svg>
-                                <span class='subtitle'>Humidity<br></span>
-                                <p class='weathervalue'>
-                                    ${wx.humidity || "--"} <sup>%</sup>
-                                </p>
-                            </div>
-                            <div class='pressure'>
-                                <svg class='iconpressure' enable-background='new 0 0 512 512' version='1.1' viewBox='0 0 512 512' xml:space='preserve' xmlns='http://www.w3.org/2000/svg'><path d='m257 0c-139.9 0-257 113.02-257 255 0 141.19 116.45 257 257 257 142.13 0 255-117.26 255-257 0-140.94-114.05-255-255-255zm0 482.2c-125.17 0-227.2-102.03-227.2-227.2 0-124.06 102.03-225.2 227.2-225.2 124.06 0 225.2 101.14 225.2 225.2 0 125.17-101.14 227.2-225.2 227.2z' fill='#3399ff'/><path d='m257 60c-107.79 0-197 87.491-197 195 0 52.603 20.817 103.59 57.114 139.89 5.853 5.854 15.356 5.857 21.213 0l21.265-21.265c5.857-5.858 5.857-15.355 0-21.213-5.857-5.857-15.355-5.857-21.213 0l-10.151 10.151c-21.339-25.839-34.552-58.395-37.565-92.559h14.337c8.284 0 15-6.716 15-15s-6.716-15-15-15h-14.303c3.129-34.135 16.816-65.304 37.812-90.277l9.87 9.87c5.857 5.857 15.355 5.858 21.213 0s5.858-15.355 0-21.213l-9.791-9.791c25.428-21.084 57.282-34.829 92.199-37.915v14.326c0 8.284 6.716 15 15 15s15-6.716 15-15v-14.311c33.219 3.008 63.624 15.9 88.248 35.709l-129.3 91.907c-13.116 9.324-20.947 23.041-20.947 36.695 0 1.025 0.038 2.043 0.113 3.053 1.702 23.035 22.481 41.947 46.887 41.947 14.542 0 28.257-7.082 36.694-18.948l91.907-129.3c19.809 24.624 32.702 55.03 35.71 88.249h-14.311c-8.284 0-15 6.716-15 15s6.716 15 15 15h14.334c-3.021 34.114-16.252 66.65-37.617 92.503l-10.096-10.096c-5.858-5.858-15.355-5.858-21.213 0s-5.858 15.355 0 21.213l21.207 21.208c5.854 5.853 15.356 5.858 21.213 0 36.334-36.333 57.172-87.299 57.172-139.83 0-107.5-87.39-195-195-195zm12.242 203.67c-2.817 3.963-7.393 6.329-12.242 6.329-8.738 0-17-7.29-17-15 0-3.782 3.347-8.702 8.328-12.243l72.316-51.402-51.402 72.316z' fill='#3399ff'/><path d='m287 362h-62c-24.813 0-45 20.187-45 45s20.187 45 45 45h62c24.813 0 45-20.187 45-45s-20.187-45-45-45zm0 60h-62c-8.271 0-15-6.729-15-15s6.729-15 15-15h62c8.271 0 15 6.729 15 15s-6.729 15-15 15z' fill='#3399ff'/></svg>
-                                <span class='subtitle'>Pressure<br></span>
-                                <p class='weathervalue'>
-                                    ${wx.pressure || "--"} <sup>mb</sup>
-                                </p>
-                            </div>`;
-                            let popup = L.popup({
-                                offset: [0, -15],
-                            })
-                                .setLatLng(a.layer.getLatLng())
-                                .setContent(html)
-                                .openOn(map);
-                        } catch (e) {
-                            console.log(e);
-                        }
+            function markerPopup(event) {
+                closeStation();
+                const marker = event.layer;
+                selectedStation = marker.options.data.title;
+                marker.getElement()?.classList.add("selected");
+                document.getElementById("station-name").textContent = selectedStation;
+                document.getElementById("station-details").textContent = "Loading station…";
+                document.getElementById("station-panel").hidden = false;
+
+                const name = selectedStation;
+                const req = new XMLHttpRequest();
+                req.open("GET", `${apiHost}/api/v0/station/${encodeURIComponent(name)}`);
+                req.onload = function () {
+                    if (selectedStation !== name) return;
+                    if (req.status !== 200) {
+                        document.getElementById("station-details").textContent = "Could not load this station. Tap it to try again.";
+                        return;
+                    }
+                    try {
+                        selectedStationData = JSON.parse(req.responseText);
+                        renderStation(selectedStationData);
+                    } catch {
+                        document.getElementById("station-details").textContent = "Station observations are unavailable.";
                     }
                 };
+                req.onerror = () => {
+                    if (selectedStation === name) document.getElementById("station-details").textContent = "Could not reach this station. Tap it to try again.";
+                };
+                req.send();
             }
+
+            function renderStation(data) {
+                const wx = { ...data.weather.wx };
+                validateWeather(wx);
+                const ago = Math.max(0, Math.floor((Date.now() - data.weather.timestamp) / 1000));
+                const value = key => defined(wx[key]) ? Convert.as(wx[key], key) : "—";
+                document.getElementById("station-details").innerHTML = `
+                    <p class="date">Observed ${secondsToText(ago, true).trim()} ago</p>
+                    <div class="station-temperature">${value("temp")}<span>${Convert.units("temp")}</span></div>
+                    <div class="station-grid">
+                        <div><span>Wind</span><strong>${value("wind_speed")} <small>${Convert.units("wind_speed")}</small></strong></div>
+                        <div><span>Gust · ${degreesToCardinal(wx.wind_direction)}</span><strong>${value("wind_gust")} <small>${Convert.units("wind_gust")}</small></strong></div>
+                        <div><span>Rain · 24 hours</span><strong>${value("rain_24h")} <small>${Convert.units("rain_24h")}</small></strong></div>
+                        <div><span>Humidity</span><strong>${value("humidity")} <small>%</small></strong></div>
+                        <div><span>Pressure</span><strong>${value("pressure")} <small>hPa</small></strong></div>
+                    </div>`;
+            }
+
+            document.addEventListener("keydown", event => {
+                if (event.key === "Escape") closeStation();
+            });
 
             //--------------------------------------------------------------------------------------------------------------
             // Utility
@@ -849,9 +451,9 @@ License: MIT
             ];
             // 360 in 16 slices (22.5 degrees in each slice)
             function degreesToCardinal(direction) {
-                if (direction == null || typeof direction === "undefined") return "--";
+                if (!defined(direction)) return "—";
                 if (direction < 0) direction = 0;
-                return cardinalStr[Math.round((direction % 360) / 22.5 + 1)];
+                return cardinalStr[Math.round((direction % 360) / 22.5)];
             }
 
             function customRound(val) {
@@ -924,7 +526,7 @@ License: MIT
                 },
                 wind_speed: function (val) {
                     if (!unitsMetric) {
-                        val = Convert.knotsToMS(val);
+                        val = val * 1.609;
                     }
                     if (val < 5) return "wind_0";
                     else if (val < 10) return "wind_1";
@@ -1050,33 +652,7 @@ License: MIT
                 },
             };
 
-            const Location = {
-                callback: null,
-                options: {
-                    enableHighAccuracy: true,
-                    timeout: 5000,
-                    maximumAge: 10 * 60 * 1000,
-                },
-                success: function(pos) {
-                    const c = pos.coords;
-                    console.log(`Latitude : ${c.latitude}`);
-                    console.log(`Longitude: ${c.longitude}`);
-                    console.log(`More or less ${c.accuracy} meters.`);
-                    if (Location.callback) {
-                        Location.callback(null, c.latitude, c.longitude);
-                    }                                        
-                },
-                error: function(err) {
-                    console.warn(`ERROR(${err.code}): ${err.message}`);
-                    if (Location.callback) {
-                        callback(err);
-                    }                    
-                },
-                get: function(callback) {
-                    Location.callback = callback;
-                    navigator.geolocation.getCurrentPosition(Location.success, Location.error, Location.options);
-                }
-            };
+            updateLegend();
         </script>
     </body>
 </html>
