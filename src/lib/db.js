@@ -21,11 +21,18 @@ module.exports = (function() {
             stationData = database.collection(Config.MONGO_DB_COL_DATA);
             stations = database.collection(Config.MONGO_DB_COL_STATIONS);
 
-            let result = await stations.createIndex({ "location": "2dsphere" });
-            result = await stations.createIndex({ stationName: "text" });
-            result = await stationData.createIndex({ stationName: "text" });
-            result = await stationData.createIndex({ stationName: 1, day: -1 });
-            result = await stationData.createIndex({ day: 1 }, { expireAfterSeconds: 31622400 }); // Expire after 1 year
+            await stations.createIndex({ "location": "2dsphere" });
+            await stations.createIndex({ stationName: 1 });
+            await stationData.createIndex({ stationName: 1, day: -1 });
+            await stationData.createIndex({ day: 1 }, { expireAfterSeconds: 31622400 }); // Expire after 1 year
+
+            // Drop the old indexes we no longer use.
+            for (const collection of [stations, stationData]) {
+                const indexes = await collection.indexes();
+                if (indexes.some(index => index.name === "stationName_text")) {
+                    await collection.dropIndex("stationName_text");
+                }
+            }
 
         } finally {
             console.log(`Connected to ${Config.MONGO_DB_NAME} DB`);
@@ -254,6 +261,11 @@ module.exports = (function() {
             const filter = { stationName: stationName, day: today };
             const options = { upsert: true };
 
+            const weather = {};
+            for (const [key, value] of Object.entries(object.wx)) {
+                if (value != null) weather[key] = value;
+            }
+
             const data = {
                 $set: {
                     receivedTime: object.receivedTime,
@@ -263,7 +275,7 @@ module.exports = (function() {
                         coordinates: [object.longitude, object.latitude],
                     },
                 },
-                $push: { samples: { timestamp: object.receivedTime, wx: object.wx } },
+                $push: { samples: { timestamp: object.receivedTime, wx: weather } },
                 $setOnInsert: {
                     stationName: stationName,
                     day: today
