@@ -39,7 +39,7 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
     position: absolute;
     top: 0;
     right: 0;
-    transform: translate(33%, -33%);
+    transform: translate(60%, -60%);
     display: grid;
     place-items: center;
     width: 18px;
