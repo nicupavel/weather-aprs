@@ -298,7 +298,12 @@ License: MIT
                 attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
             }).addTo(map);
 
-            let DN = L.terminator();
+            let DN = L.terminator({
+                renderer: L.svg({ padding: 0.5 }),
+                interactive: false,
+                stroke: false,
+                resolution: 1,
+            });
             DN.addTo(map);
             setInterval(() => {
                 DN.setTime();
