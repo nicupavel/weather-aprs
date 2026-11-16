@@ -7,14 +7,39 @@ License: MIT
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>Meteo Glance - Actual Weather from world-wide APRS stations</title>
+        <title>Live Weather Station Map &amp; History | MeteoGlance</title>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="description" content="Real observed meteo weather data from weather APRS stations with a worldwide glance view"/>
-        <meta name="robots" content="index, noarchive"/>
+        <meta name="description" content="Explore observed weather from APRS and CWOP stations worldwide. View temperature, wind, rainfall, humidity, pressure, and historical charts.">
+        <meta name="robots" content="index, follow">
         <link rel="icon" href="favicon.ico">
         <link rel="apple-touch-icon" sizes="63x68" href="icon.png">
-        <link rel="canonical" href="https://meteoglance.com"/>
+        <link rel="canonical" href="https://meteoglance.com/">
+        <meta property="og:type" content="website">
+        <meta property="og:site_name" content="MeteoGlance">
+        <meta property="og:title" content="Live Weather Station Map &amp; History | MeteoGlance">
+        <meta property="og:description" content="Explore observed weather from APRS and CWOP stations worldwide, with live maps and historical charts.">
+        <meta property="og:url" content="https://meteoglance.com/">
+        <meta property="og:image" content="https://meteoglance.com/social-preview.png">
+        <meta property="og:image:width" content="1200">
+        <meta property="og:image:height" content="630">
+        <meta property="og:image:alt" content="MeteoGlance weather map showing observed temperatures across Europe and nearby regions.">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="Live Weather Station Map &amp; History | MeteoGlance">
+        <meta name="twitter:description" content="Explore observed weather from APRS and CWOP stations worldwide, with live maps and historical charts.">
+        <meta name="twitter:image" content="https://meteoglance.com/social-preview.png">
+        <meta name="twitter:image:alt" content="MeteoGlance weather map showing observed temperatures across Europe and nearby regions.">
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "@id": "https://meteoglance.com/#website",
+            "name": "MeteoGlance",
+            "url": "https://meteoglance.com/",
+            "description": "Observed weather from APRS and CWOP stations worldwide, with an interactive map and historical charts.",
+            "inLanguage": "en"
+        }
+        </script>
         <link
             rel="stylesheet"
             href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
@@ -38,6 +63,14 @@ License: MIT
     </head>
     <body>
         <!-- <header class="brand"><strong>MeteoGlance</strong><span>Weather observed around the world</span></header> -->
+        <noscript>
+            <section class="noscript-message">
+                <h2>MeteoGlance — live weather station map</h2>
+                <p>Explore observed temperature, wind, rainfall, humidity, and pressure from APRS and CWOP stations worldwide.</p>
+                <p>Enable JavaScript to use the interactive map, select stations, and explore historical weather charts.</p>
+                <p><a href="https://github.com/nicupavel/weather-aprs">About the MeteoGlance project</a></p>
+            </section>
+        </noscript>
         <nav aria-label="Map controls">
             <div class="map-tools panel">
                 <button id="locate-button" onclick="locationChange()" aria-label="Locate me" title="Locate me"><svg class="control-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg></button>
@@ -60,7 +93,7 @@ License: MIT
             <aside id="legend" class="legend panel" aria-label="Weather color scale"></aside>
             <section id="station-panel" class="station-panel panel" aria-label="Station details" hidden>
                 <button class="close" onclick="closeStation()" aria-label="Close station details">×</button>
-                <h1 id="station-name"></h1>
+                <h2 id="station-name"></h2>
                 <div id="station-details" aria-live="polite"></div>
                 <button id="history-button" class="history-button" onclick="History.show()">
                     <svg class="control-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M6 15l4-5 4 3 6-8"/></svg>
@@ -69,6 +102,25 @@ License: MIT
             </section>
         </main>
 
+        <dialog id="about-dialog" aria-labelledby="about-title">
+            <header class="about-header">
+                <button class="close" onclick="document.getElementById('about-dialog').close()" aria-label="Close about">×</button>
+                <p class="eyebrow">About</p>
+                <h1 id="about-title">MeteoGlance</h1>
+                <p class="about-intro">Live weather observations, around the world.</p>
+            </header>
+            <div class="about-content">
+                <p>MeteoGlance maps measurements reported by APRS and CWOP weather stations worldwide. Explore observed temperature, wind speed and gusts, rainfall, humidity, and atmospheric pressure.</p>
+                <h2>Explore the map</h2>
+                <p>Choose a weather icon to change the measurement shown on the map. Select a station to see its latest readings and observation time. A plus badge marks a group of stations; its number is their average. Zoom in to explore individual stations.</p>
+                <h2>See how the weather changes</h2>
+                <p>Open <strong>History</strong> in a station’s details for day, week, month, and year charts. These show available observations, with averages and peaks appropriate to each measurement. Gaps mean no readings were received.</p>
+                <h2>Where the data comes from</h2>
+                <p>Readings come from the <a href="https://www.aprs.org/">Automatic Packet Reporting System (APRS)</a> and the <a href="https://www.wxqa.com/">Citizen Weather Observer Program (CWOP)</a>. These are station observations, rather than forecasts. Availability and accuracy depend on the reporting station.</p>
+                <p>Use the location button to center the map near you, and °C / °F to switch between metric and imperial units. Rain charts show the reported rolling 24-hour rainfall, not a total for the selected period.</p>
+                <footer>Created by <a href="https://github.com/nicupavel/weather-aprs">Nicu Pavel · Linux Consulting</a>. Source code is available under the MIT license. Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>.</footer>
+            </div>
+        </dialog>
         <dialog id="history-dialog" aria-labelledby="history-title" onclose="History.cancel()">
             <header class="history-header">
                 <p class="eyebrow">Station history</p>
@@ -236,7 +288,7 @@ License: MIT
             
             L.control.zoom({ position: "bottomright" }).addTo(map);
 
-            map.attributionControl.setPrefix('© <a href="https://github.com/nicupavel/weather-aprs">Nicu Pavel MeteoGlance</a>');
+            map.attributionControl.setPrefix(`<a href="#about-dialog" onclick="event.preventDefault(); document.getElementById('about-dialog').showModal()" aria-label="About MeteoGlance" aria-haspopup="dialog" title="About MeteoGlance">© Nicu Pavel MeteoGlance</a>`);
 
             // add the OpenStreetMap tiles
             L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -445,7 +497,7 @@ License: MIT
             }
 
             document.addEventListener("keydown", event => {
-                if (event.key === "Escape" && !document.getElementById("history-dialog").open) closeStation();
+                if (event.key === "Escape" && !document.querySelector("dialog[open]")) closeStation();
             });
 
             //--------------------------------------------------------------------------------------------------------------
