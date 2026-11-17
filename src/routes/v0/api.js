@@ -1,5 +1,22 @@
 const Router = require('express').Router();
 const DB = require('../../lib/db.js');
+const MetNo = require('../../lib/met-no.js');
+
+Router.get('/forecast', async (req, res) => {
+    const lat = Number(req.query.lat);
+    const lon = Number(req.query.lon);
+    if (!req.query.lat || !req.query.lon || !Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) {
+        return res.status(400).json({ error: 'Valid latitude and longitude are required.' });
+    }
+    try {
+        const forecast = await MetNo.getForecast(lat, lon);
+        if (!forecast) return res.status(503).json({ error: 'Forecast temporarily unavailable.' });
+        return res.json(forecast);
+    } catch (error) {
+        console.error('Could not load MET Norway forecast', error.message);
+        return res.status(503).json({ error: 'Forecast temporarily unavailable.' });
+    }
+});
 
 Router.get("/stations", getAllStations);
 Router.get("/stations/data", getAllStationsAndTodayData);

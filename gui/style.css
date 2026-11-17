@@ -82,17 +82,45 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .humidity_3 { background: #927bb8; color: #211a31; }
 .humidity_4 { background: #735794; color: white; }
 .humidity_5 { background: #503963; color: white; }
-.station-panel { position: absolute; z-index: 600; right: 80px; bottom: 32px; width: 340px; padding: 22px; max-height: calc(100dvh - 170px); overflow-y: auto; }
+.station-panel { position: absolute; z-index: 600; right: 80px; bottom: 32px; width: 360px; padding: 22px; max-height: calc(100dvh - 170px); overflow-y: auto; }
 [hidden] { display: none !important; }
 .close { position: absolute; top: 5px; right: 5px; width: 44px; font-size: 26px; color: var(--muted); }
 h1 { font-size: 19px; margin: 0 25px 5px 0; overflow-wrap: anywhere; }
 .date { color: var(--muted); font-size: 12px; margin: 0; }
-.station-temperature { font-size: 58px; font-weight: 700; letter-spacing: -2px; margin: 14px 0; }
-.station-temperature span { font-size: 23px; color: var(--muted); font-weight: 400; letter-spacing: 0; margin-left: 5px; }
-.station-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 12px; border-top: 1px solid #e4eaf0; padding-top: 16px; }
-.station-grid > div > span { display: block; color: var(--muted); font-size: 12px; margin-bottom: 5px; }
-.station-grid strong { font-size: 21px; font-weight: 600; }
-.station-grid small { font-size: 12px; color: var(--muted); font-weight: 400; }
+.station-current { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 18px 0; }
+.station-temperature { display: flex; align-items: center; gap: 6px; font-size: 48px; letter-spacing: -2px; white-space: nowrap; }
+.station-temperature strong { font-weight: 650; }
+.station-temperature small { font-size: 19px; color: var(--muted); font-weight: 400; letter-spacing: 0; margin-left: 3px; }
+.sky-icon { display: block; width: 36px; height: 36px; object-fit: contain; }
+#station-sky:empty { display: none; }
+#station-sky .sky-icon { width: 58px; height: 58px; }
+.metric-icon { width: 22px; height: 22px; flex-shrink: 0; }
+.station-wind { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 70px; }
+.station-wind > .metric-icon { color: var(--muted); width: 27px; height: 27px; }
+.station-wind > strong { font-size: 21px; font-weight: 600; white-space: nowrap; }
+.station-wind small { font-size: 10px; font-weight: 400; color: var(--muted); }
+.station-gust { display: flex; align-items: center; gap: 3px; font-size: 11px; color: var(--muted); }
+.station-gust .metric-icon { width: 14px; height: 14px; }
+.wind-direction { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+.station-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.station-grid > div { position: relative; display: flex; justify-content: center; align-items: center; gap: 4px; min-width: 0; }
+.station-grid .metric-icon { width: 19px; height: 19px; color: var(--muted); }
+.station-grid strong { font-size: 17px; font-weight: 600; white-space: nowrap; }
+.station-grid small { font-size: 10px; color: var(--muted); font-weight: 400; margin-left: 2px; }
+.rain-period { position: absolute; top: 23px; font-size: 9px; color: var(--muted); }
+.station-forecast, .forecast-status { border-top: 1px solid #e4eaf0; margin-top: 26px; padding-top: 16px; }
+.forecast-status { font-size: 12px; color: var(--muted); }
+.forecast-days { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 3px; }
+.forecast-day { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 0; }
+.forecast-weekday { font-size: 12px; font-weight: 500; }
+.forecast-temperatures { display: flex; gap: 5px; font-size: 13px; white-space: nowrap; }
+.forecast-temperatures strong { font-weight: 600; }
+.forecast-temperatures > span { color: var(--muted); }
+.forecast-rain { display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--accent); font-size: 11px; }
+.forecast-rain .metric-icon { width: 13px; height: 13px; }
+.forecast-no-icon { height: 36px; line-height: 36px; color: var(--muted); }
+.forecast-credit { margin: 14px 0 0; text-align: center; color: var(--muted); font-size: 10px; }
+.forecast-credit a { color: inherit; text-underline-offset: 2px; }
 .leaflet-bar { border: 1px solid #dce4ea !important; border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; }
 .leaflet-bar a { width: 44px !important; height: 44px !important; line-height: 44px !important; color: #203142; }
 .leaflet-bottom.leaflet-right { margin: 0 10px 16px 0; }
@@ -109,16 +137,20 @@ h1 { font-size: 19px; margin: 0 25px 5px 0; overflow-wrap: anywhere; }
     .legend-scale { margin-top: 8px; }
     .legend strong { font-size: 12px; }
     .station-panel { left: 12px; right: 12px; bottom: calc(88px + env(safe-area-inset-bottom)); width: auto; padding: 18px; max-height: calc(100dvh - 170px - env(safe-area-inset-bottom)); }
-    .station-temperature { font-size: 48px; margin: 8px 0; }
-    .station-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 8px; }
-    .station-grid strong { font-size: 18px; }
     .status { top: 80px; }
     .location-status { top: 130px; }
     .leaflet-bottom.leaflet-right { margin-bottom: calc(88px + env(safe-area-inset-bottom)); margin-right: 4px; }
     .leaflet-control-attribution { position: fixed; bottom: 0; right: 0; max-width: 100%; }
 }
 @media (max-width: 360px) {
-    .station-grid { grid-template-columns: 1fr 1fr; }
+    .station-temperature { font-size: 40px; gap: 3px; }
+    .station-temperature small { font-size: 16px; }
+    #station-sky .sky-icon { width: 44px; height: 44px; }
+    .station-grid strong { font-size: 15px; }
+    .station-grid .metric-icon { width: 16px; height: 16px; }
+    .station-grid > div { gap: 3px; }
+    .station-grid small { font-size: 9px; }
+    .forecast-temperatures { font-size: 12px; gap: 3px; }
 }
 
 /* Station history */

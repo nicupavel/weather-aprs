@@ -117,6 +117,7 @@ License: MIT
                 <p>Open <strong>History</strong> in a station’s details for day, week, month, and year charts. These show available observations, with averages and peaks appropriate to each measurement. Gaps mean no readings were received.</p>
                 <h2>Where the data comes from</h2>
                 <p>Readings come from the <a href="https://www.aprs.org/">Automatic Packet Reporting System (APRS)</a> and the <a href="https://www.wxqa.com/">Citizen Weather Observer Program (CWOP)</a>. These are station observations, rather than forecasts. Availability and accuracy depend on the reporting station.</p>
+                <p>Sky icons and the five-day forecast come from <a href="https://www.met.no/en">MET Norway</a> under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. The sky icon is a forecast for the station’s location, not an observed sky report. Daily highs and lows are calculated from forecast samples; days use your local time. Percentages show the highest available precipitation chance for a forecast interval that day, including rain or snow. A dash means the provider has no probability data. Weather icons © Yr, used under the MIT license.</p>
                 <p>Use the location button to center the map near you, and °C / °F to switch between metric and imperial units. Rain charts show the reported rolling 24-hour rainfall, not a total for the selected period.</p>
                 <footer>Created by <a href="https://github.com/nicupavel/weather-aprs">Nicu Pavel · Linux Consulting</a>. Source code is available under the MIT license. Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>.</footer>
             </div>
@@ -137,6 +138,7 @@ License: MIT
             <div id="history-charts" class="history-charts"></div>
             <p class="history-note">Times are local. Charts show available observations; gaps mean no readings. Rain is the reported rolling 24-hour amount, not a period total.</p>
         </dialog>
+        <script src="forecast.js"></script>
         <script>
             let unitsMetric = true;
             let selectedWeatherKey = "temp";
@@ -449,6 +451,7 @@ License: MIT
             let selectedStationData = null;
 
             function closeStation() {
+                Forecast.cancel();
                 selectedStation = null;
                 selectedStationData = null;
                 document.getElementById("station-panel").hidden = true;
@@ -476,6 +479,7 @@ License: MIT
                     try {
                         selectedStationData = JSON.parse(req.responseText);
                         renderStation(selectedStationData);
+                        Forecast.load(selectedStationData.location.coordinates);
                     } catch {
                         document.getElementById("station-details").textContent = "Station observations are unavailable.";
                     }
@@ -493,14 +497,22 @@ License: MIT
                 const value = key => defined(wx[key]) ? formatMeasurement(Convert.as(wx[key], key), key) : "—";
                 document.getElementById("station-details").innerHTML = `
                     <p class="date">Observed ${secondsToText(ago, true).trim()} ago</p>
-                    <div class="station-temperature">${value("temp")}<span>${Convert.units("temp")}</span></div>
+                    <div class="station-current">
+                        <div class="station-temperature"><span id="station-sky"></span><strong>${value("temp")}<small>${Convert.units("temp")}</small></strong></div>
+                        <div class="station-wind" title="Wind from ${degreesToCardinal(wx.wind_direction)}" aria-label="Wind from ${degreesToCardinal(wx.wind_direction)}">
+                            ${metricIcon('wind')}
+                            <strong>${value("wind_speed")} <small>${Convert.units("wind_speed")}</small></strong>
+                            <span class="station-gust" title="Wind gusts" aria-label="Wind gusts: ${value("wind_gust")} ${Convert.units("wind_gust")}">${metricIcon('gust')} ${value("wind_gust")} <small>${Convert.units("wind_gust")}</small></span>
+                            <span class="wind-direction">${degreesToCardinal(wx.wind_direction)}</span>
+                        </div>
+                    </div>
                     <div class="station-grid">
-                        <div><span>Wind</span><strong>${value("wind_speed")} <small>${Convert.units("wind_speed")}</small></strong></div>
-                        <div><span>Gust · ${degreesToCardinal(wx.wind_direction)}</span><strong>${value("wind_gust")} <small>${Convert.units("wind_gust")}</small></strong></div>
-                        <div><span>Rain · 24 hours</span><strong>${value("rain_24h")} <small>${Convert.units("rain_24h")}</small></strong></div>
-                        <div><span>Humidity</span><strong>${value("humidity")} <small>%</small></strong></div>
-                        <div><span>Pressure</span><strong>${value("pressure")} <small>hPa</small></strong></div>
-                    </div>`;
+                        <div title="Humidity" aria-label="Humidity: ${value("humidity")}%">${metricIcon('humidity')}<strong>${value("humidity")}<small>%</small></strong></div>
+                        <div title="Atmospheric pressure" aria-label="Atmospheric pressure: ${value("pressure")} hPa">${metricIcon('pressure')}<strong>${value("pressure")}<small>hPa</small></strong></div>
+                        <div title="Rain in the last 24 hours" aria-label="Rain in the last 24 hours: ${value("rain_24h")} ${Convert.units("rain_24h")}">${metricIcon('rain')}<strong>${value("rain_24h")}<small>${Convert.units("rain_24h")}</small></strong><span class="rain-period">24h</span></div>
+                    </div>
+                    <div id="station-forecast" class="forecast-status" aria-live="polite"></div>`;
+                Forecast.render();
             }
 
             document.addEventListener("keydown", event => {

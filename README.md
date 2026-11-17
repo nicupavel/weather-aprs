@@ -22,6 +22,7 @@ Clicking on markers shows detailed information about the station and weather dat
 
 Unstructured data is saved in a Mongo DB with a default historical limit of 1 year of previous observations. 
 REST API for querying all stations or station by name or nearby latitude/longitude location (see below). 
+The forecast is taken from MET.no on client request (popup opened from UI) and cached in memory for 3h. Nothing is saved to DB.
 
 ## Running
 The easiest way is to run this project through provided docker-compose. This will setup the entire "stack" and required modules.
@@ -55,6 +56,7 @@ Data returned is an object with the format:
 
 
 - ```GET /api/v0/station/:name``` - returns data for specified station name
+- `GET /api/v0/forecast?lat=47.16&lon=27.59` - cached MET Norway forecast samples for a location, including temperature, condition symbols, and precipitation probability where available. Coordinates are rounded to two decimals for cache reuse.
 - `GET /api/v0/station/:name/history?period=day` - historical readings for one station. Periods: `day` (24 hours), `week` (7 days), `month` (30 days), and `year` (365 days).
   returns `points` ordered by bucket timestamp, using 15-minute, hourly, 6-hour, or daily buckets respectively. `point` contains a sample `count`, average temperature/wind speed/humidity/pressure, and peak gust/rolling day rain.  Month and year views are paginated with seven days per request. Next chunk are older measurements. Request next page using the previous response: `to=<response.to>&before=<response.next>`.
 - ```GET /api/v0/nearby/:lat/:lon/:dist``` - returns nearby stations by the specified longitude, latitude and distance
