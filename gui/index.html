@@ -247,7 +247,7 @@ License: MIT
                     iconSize: [36, 36],
                     className: "weather-marker " + ColorCodes[selectedWeatherKey](val),
                     html: isCluster
-                        ? `<div id="${id}">${val}<span class="cluster-badge"><span>+</span></span></div>`
+                        ? `<div id="${id}">${val}<svg class="cluster-badge" viewBox="0 0 18 18" aria-hidden="true" focusable="false"><circle cx="9" cy="9" r="8" fill="black" stroke="white" stroke-width="2"/><path d="M5 9h8M9 5v8" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></div>`
                         : `<div id="${id}">${val}</div>`,
                 });
             }

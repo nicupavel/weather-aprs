@@ -42,21 +42,9 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
     top: 0;
     right: 0;
     transform: translate(40%, -40%);
-    display: grid;
-    place-items: center;
+    display: block;
     width: 18px;
     height: 18px;
-    padding: 0;
-    border: 2px solid white;
-    border-radius: 50%;
-    background: #203142;
-    color: white;
-    font-size: 18px;
-    line-height: 1;
-}
-
-.cluster-badge > span {
-    transform: translate(0px, -2px);
 }
 .temp_0 { background: #7462b4; color: white; }
 .temp_1 { background: #91c5ed; color: #173b58; }
