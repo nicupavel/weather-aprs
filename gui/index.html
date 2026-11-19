@@ -240,9 +240,10 @@ License: MIT
             const swLimit = L.latLng(-90, -200);
             const neLimit = L.latLng(90, 200);
             const bounds = L.latLngBounds(swLimit, neLimit);
-            const refreshInterval = 5 * 60 * 1000;
+            const refreshInterval = 30 * 60 * 1000;
 
             function createIcon(id, val, isCluster) {
+                if (!Number.isFinite(val)) val = "!";
                 return L.divIcon({
                     iconSize: [36, 36],
                     className: "weather-marker " + ColorCodes[selectedWeatherKey](val),
@@ -261,6 +262,7 @@ License: MIT
                 if (!Validate.metric[selectedWeatherKey](val)) {
                     val = "!";
                 } else {
+                    val = Convert.as(val, selectedWeatherKey);
                     val = customRound(val);
                 }
 
@@ -309,7 +311,7 @@ License: MIT
             DN.addTo(map);
             setInterval(() => {
                 DN.setTime();
-            }, refreshInterval);
+            }, 5 * 60 * 1000);
 
             let markers = L.markerClusterGroup({
                 addedToView: false,
@@ -325,7 +327,7 @@ License: MIT
                         count++;
                         sum += +val;
                     }
-                    let avgValue = customRound(sum / count);
+                    let avgValue = count ? customRound(sum / count) : "!";
 
                     return createIcon("cluster", avgValue, true);
                 },
@@ -337,13 +339,7 @@ License: MIT
                     return;
                 }
 
-                let val = weatherData[markerId][WeatherKeysIdx[selectedWeatherKey]];
-
-                if (!unitsMetric) {
-                    val = Convert.as(val, selectedWeatherKey);
-                }
-
-                val = customRound(val);
+                const val = getMarkerData(markerId).visibleValue;
 
                 // Update value for cluster average, this will be refreshed by .refreshClusters()
                 // Since the actual element is not yet in DOM we need to recreate the icon
@@ -381,25 +377,36 @@ License: MIT
             //const port = null;
             //const apiHost = `${server}${port?`:${port}`:''}`;
 
+            let weatherRequest = null;
+            let observationsLoaded = false;
+            let refreshTimer;
+
             function apiGetWeatherData() {
+                if (weatherRequest) return;
                 const status = document.getElementById("loading");
-                status.textContent = "Updating observations…";
-                status.style.display = "block";
+                if (!observationsLoaded) {
+                    status.textContent = "Loading observations…";
+                    status.style.display = "block";
+                }
                 let req = new XMLHttpRequest();
+                weatherRequest = req;
                 req.open("GET", `${apiHost}/api/v0/stations/data/tight/wind_speed,temp,rain_24h,humidity`);
+                req.timeout = 30000;
                 req.onreadystatechange = function () {
                     if (this.readyState !== 4) return;
+                    weatherRequest = null;
                     if (this.status !== 200) {
-                        status.textContent = "Could not update observations. Retrying in 5 minutes.";
+                        if (!observationsLoaded) status.textContent = "Could not load observations. Return to this page to retry, or wait 30 minutes.";
                         return;
                     }
                     if (this.status == 200) {
                         try {
                             weatherData = JSON.parse(this.responseText);
                             updateStations(weatherData);
+                            observationsLoaded = true;
                             document.getElementById("loading").style.display = "none";
                         } catch (err) {
-                            status.textContent = "Could not read observations. Retrying in 5 minutes.";
+                            if (!observationsLoaded) status.textContent = "Could not read observations. Return to this page to retry, or wait 30 minutes.";
                             console.error("Error parsing API data");
                             console.error(err);
                         }
@@ -410,13 +417,28 @@ License: MIT
             }
 
             function scheduleRefresh(interval) {
-                setTimeout(() => {
-                    apiGetWeatherData();
+                clearTimeout(refreshTimer);
+                refreshTimer = setTimeout(() => {
+                    if (!document.hidden) apiGetWeatherData();
                     scheduleRefresh(refreshInterval);
                 }, interval);
             }
 
             scheduleRefresh(0);
+
+            function refreshOnReturn() {
+                if (document.hidden) return;
+                apiGetWeatherData();
+                scheduleRefresh(refreshInterval);
+            }
+
+            document.addEventListener("visibilitychange", () => {
+                if (!document.hidden) refreshOnReturn();
+            });
+            window.addEventListener("focus", refreshOnReturn);
+            window.addEventListener("pageshow", event => {
+                if (event.persisted) refreshOnReturn();
+            });
 
             //--------------------------------------------------------------------------------------------------------------
             // API Calls reactive functions
@@ -424,18 +446,19 @@ License: MIT
             let allMarkers = {};
 
             function updateStations(data) {
+                for (const name in allMarkers) {
+                    if (!(name in data)) {
+                        markers.removeLayer(allMarkers[name]);
+                        delete allMarkers[name];
+                    }
+                }
                 for (const s in data) {
                     if (!(s in allMarkers)) {
                         const marker = createMarker(s);
                         allMarkers[s] = marker;
                         markers.addLayer(allMarkers[s]);
                     } else {
-                        const markerData = getMarkerData(s);
-                        allMarkers[s].icon = createIcon(s, markerData.visibleValue);
-                        allMarkers[s].data = {
-                            title: s,
-                            visibleValue: markerData.visibleValue,
-                        };
+                        refreshMarkerData(s);
                     }
                 }
                 console.log(`Stations: ${Object.keys(allMarkers).length}`);
@@ -445,6 +468,7 @@ License: MIT
                     markers.on("click", markerPopup);
                     markers.addedToView = true;
                 }
+                markers.refreshClusters(allMarkers);
             }
 
             let selectedStation = null;
